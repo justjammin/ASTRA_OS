@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "astra-os/plan.schema.json",
+  "title": "Astra Gate 4 — Executable DAG",
+  "description": "Vertical slices decomposed into a dependency graph. Every node carries a scoped agent role: its own system prompt, write boundary drawn from the Gate 3 contract, and declared inputs/outputs.",
+  "type": "object",
+  "required": ["meta", "slices", "nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["slug", "intent", "agent"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "intent": { "type": "string", "minLength": 1 },
+        "agent": { "enum": ["claude", "droid", "opencode", "hermes", "codex"] },
+        "schemaVersion": { "type": "string" },
+        "createdAt": { "type": "string" }
+      }
+    },
+    "slices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "demo", "tracer", "criteria", "nodes"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^s[0-9]+$" },
+          "title": { "type": "string", "minLength": 1 },
+          "demo": { "type": "string", "minLength": 1, "description": "what a human can see working when this slice lands" },
+          "tracer": { "type": "boolean" },
+          "criteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "nodes": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^n[0-9]+$" } }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "slice", "kind", "role", "deps"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^n[0-9]+$" },
+          "title": { "type": "string", "minLength": 1 },
+          "slice": { "type": "string", "pattern": "^s[0-9]+$" },
+          "kind": {
+            "enum": ["implement", "static", "unit", "integration", "e2e"],
+            "description": "implement writes code; the other four are Testing Trophy verification layers"
+          },
+          "deps": { "type": "array", "items": { "type": "string", "pattern": "^n[0-9]+$" } },
+          "parallel": { "type": "boolean" },
+          "role": {
+            "type": "object",
+            "required": ["name", "systemPrompt", "writeBoundary"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "systemPrompt": { "type": "string", "minLength": 1 },
+              "writeBoundary": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 },
+                "description": "paths from call-stack-types.json this node may write; anything else is out of bounds"
+              },
+              "inputs": { "type": "array", "items": { "type": "string" } },
+              "outputs": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "task": { "type": "string", "description": "node-specific instruction appended to the role prompt" },
+          "command": { "type": "string", "description": "shell verification command; when present the node runs it instead of invoking the agent" },
+          "assertions": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

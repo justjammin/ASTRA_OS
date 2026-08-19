@@ -1,0 +1,4 @@
+node_modules/
+.astra/
+.DS_Store
+*.log

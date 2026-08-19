@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="132" viewBox="0 0 5529 1300" role="img" aria-labelledby="astra-title">
+  <title id="astra-title">ASTRA OS</title>
+  <!-- Wordmark set in Chakra Petch Bold (Google Fonts, SIL OFL 1.1), converted to outlines so it
+       renders identically with no webfont available. Palette: promper Horizon tokens in sRGB. -->
+  <defs>
+    <linearGradient id="astra-chrome" x1="0" y1="0" x2="1" y2="0.7">
+      <stop offset="0" stop-color="#f84527"/>
+      <stop offset=".42" stop-color="#f8a823"/>
+      <stop offset=".58" stop-color="#9fd22c"/>
+      <stop offset="1" stop-color="#49abfd"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#807d4f" stroke-width="5" fill="none" opacity=".7">
+    <path d="M90 1150H5439"/>
+    <path d="M430 1270 2764.5 1150 5099 1270" opacity=".55"/>
+    <path d="M1270 1270 2764.5 1150 4259 1270" opacity=".4"/>
+    <path d="M2764.5 1150V1270" opacity=".5"/>
+  </g>
+  <g transform="translate(0 1010) scale(1 -1)" fill="url(#astra-chrome)">
+    <path transform="translate(90 0)" d="M386 700H522L136 0H0Z"/> <path transform="translate(612 0)" d="M65 846H199V-204H65Z"/> <path transform="translate(876 0)" d="M50 108V208H184V149L217 116H424L458 150V266L425 299H160L52 407V592L160 700H476L584 592V491H450V551L417 584H219L186 551V448L219 415H484L592 307V110L482 0H158Z"/> <path transform="translate(1513 0)" d="M224 585H15V700H569V585H360V0H224Z"/> <path transform="translate(2097 0)" d="M615 232V0H479V201L419 268H201V0H65V700H504L611 592V380L543 311ZM201 380H442L477 415V551L442 586H201Z"/> <path transform="translate(2772 0)" d="M386 700H522L136 0H0Z"/> <path transform="translate(3294 0)" d="M65 846H199V-204H65Z"/> <path transform="translate(4102 0)" d="M55 115V585L170 700H530L645 585V115L530 0H170ZM458 116 509 167V533L458 584H242L191 533V167L242 116Z"/> <path transform="translate(4802 0)" d="M50 108V208H184V149L217 116H424L458 150V266L425 299H160L52 407V592L160 700H476L584 592V491H450V551L417 584H219L186 551V448L219 415H484L592 307V110L482 0H158Z"/>
+  </g>
+</svg>

@@ -1,0 +1,859 @@
+{
+  "schemaVersion": 1,
+  "occurrences": [
+    {
+      "carousel": "Microservices patterns",
+      "slide": 2,
+      "label": "API Gateway",
+      "id": "api-gateway",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 3,
+      "label": "Service Discovery",
+      "id": "service-discovery",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 4,
+      "label": "Circuit Breaker",
+      "id": "circuit-breaker",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 5,
+      "label": "Database per Service",
+      "id": "database-per-service",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 6,
+      "label": "Saga Pattern",
+      "id": "saga",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 7,
+      "label": "CQRS",
+      "id": "cqrs",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 8,
+      "label": "Event Sourcing",
+      "id": "event-sourcing",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 9,
+      "label": "Sidecar Pattern",
+      "id": "sidecar",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 10,
+      "label": "Service Mesh",
+      "id": "service-mesh",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 11,
+      "label": "Strangler Fig",
+      "id": "strangler-fig",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 12,
+      "label": "Bulkhead Pattern",
+      "id": "bulkhead",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 13,
+      "label": "Backend for Frontend",
+      "id": "backend-for-frontend",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 14,
+      "label": "Externalized Config",
+      "id": "externalized-config",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 15,
+      "label": "Health Check API",
+      "id": "liveness-readiness",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Microservices patterns",
+      "slide": 16,
+      "label": "Distributed Tracing",
+      "id": "distributed-tracing",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Data and messaging patterns",
+      "slide": 2,
+      "label": "Snapshot Pattern",
+      "id": "snapshot",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Data and messaging patterns",
+      "slide": 3,
+      "label": "Temporal Data",
+      "id": "temporal-data",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Data and messaging patterns",
+      "slide": 4,
+      "label": "Inbox-Outbox Pattern",
+      "id": "inbox-pattern",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Data and messaging patterns",
+      "slide": 5,
+      "label": "Command Pattern",
+      "id": "command",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Data and messaging patterns",
+      "slide": 6,
+      "label": "Backpressure Pattern",
+      "id": "backpressure",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Data and messaging patterns",
+      "slide": 7,
+      "label": "Work Queue Pattern",
+      "id": "work-queue",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Data and messaging patterns",
+      "slide": 8,
+      "label": "Service Mesh Pattern",
+      "id": "service-mesh",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 2,
+      "label": "Single Responsibility",
+      "id": "single-responsibility",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 3,
+      "label": "Open/Closed Principle",
+      "id": "open-closed",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 4,
+      "label": "Liskov Substitution",
+      "id": "liskov-substitution",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 5,
+      "label": "Interface Segregation",
+      "id": "interface-segregation",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 6,
+      "label": "Dependency Inversion",
+      "id": "dependency-inversion",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 7,
+      "label": "Singleton",
+      "id": "singleton",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 8,
+      "label": "Factory Method",
+      "id": "factory-method",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 9,
+      "label": "Builder",
+      "id": "builder",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 10,
+      "label": "Adapter",
+      "id": "adapter",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 11,
+      "label": "Decorator",
+      "id": "decorator",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 12,
+      "label": "Facade",
+      "id": "facade",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 13,
+      "label": "Proxy",
+      "id": "proxy",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 14,
+      "label": "Strategy",
+      "id": "strategy",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 15,
+      "label": "Observer",
+      "id": "observer",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 16,
+      "label": "Command",
+      "id": "command",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 17,
+      "label": "State",
+      "id": "state",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 18,
+      "label": "Template Method",
+      "id": "template-method",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Object design patterns",
+      "slide": 19,
+      "label": "Chain of Responsibility",
+      "id": "chain-of-responsibility",
+      "domain": "object-design",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Optimization patterns",
+      "slide": 2,
+      "label": "Failover Pattern",
+      "id": "failover",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Optimization patterns",
+      "slide": 3,
+      "label": "Consistent Hashing",
+      "id": "consistent-hashing",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Optimization patterns",
+      "slide": 4,
+      "label": "Aggregator Pattern",
+      "id": "aggregator",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Optimization patterns",
+      "slide": 5,
+      "label": "Blue-Green Deployment",
+      "id": "blue-green-deployment",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Optimization patterns",
+      "slide": 6,
+      "label": "Soft Delete",
+      "id": "soft-delete",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Optimization patterns",
+      "slide": 7,
+      "label": "Distributed Cache",
+      "id": "distributed-cache",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Optimization patterns",
+      "slide": 8,
+      "label": "Anti-Corruption Layer",
+      "id": "anti-corruption-layer",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Advanced backend patterns",
+      "slide": 2,
+      "label": "API Gateway",
+      "id": "api-gateway",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Advanced backend patterns",
+      "slide": 3,
+      "label": "Backend for Frontend",
+      "id": "backend-for-frontend",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Advanced backend patterns",
+      "slide": 4,
+      "label": "Circuit Breaker",
+      "id": "circuit-breaker",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Advanced backend patterns",
+      "slide": 5,
+      "label": "Bulkhead Pattern",
+      "id": "bulkhead",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Advanced backend patterns",
+      "slide": 6,
+      "label": "Outbox Pattern",
+      "id": "transactional-outbox",
+      "domain": "data-messaging",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Advanced backend patterns",
+      "slide": 7,
+      "label": "Sidecar Pattern",
+      "id": "sidecar",
+      "domain": "infrastructure-delivery",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Advanced backend patterns",
+      "slide": 8,
+      "label": "Hexagonal Architecture",
+      "id": "hexagonal-architecture",
+      "domain": "architecture-resilience",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 2,
+      "label": "Structured Logging",
+      "id": "structured-logging",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 3,
+      "label": "Log Levels & Sampling",
+      "id": "log-levels-sampling",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 4,
+      "label": "Correlation IDs",
+      "id": "correlation-ids",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 5,
+      "label": "Distributed Tracing",
+      "id": "distributed-tracing",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 6,
+      "label": "Trace Context Propagation",
+      "id": "trace-context-propagation",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 7,
+      "label": "The Four Golden Signals",
+      "id": "four-golden-signals",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 8,
+      "label": "The RED Method",
+      "id": "red-method",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 9,
+      "label": "The USE Method",
+      "id": "use-method",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 10,
+      "label": "Percentiles Over Averages",
+      "id": "percentiles",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 11,
+      "label": "Liveness & Readiness Probes",
+      "id": "liveness-readiness",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 12,
+      "label": "Alert on Symptoms",
+      "id": "symptom-alerts",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 13,
+      "label": "SLIs, SLOs & Error Budgets",
+      "id": "slis-slos-error-budgets",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 14,
+      "label": "Dashboards as Code",
+      "id": "dashboards-as-code",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 15,
+      "label": "Centralized Log Aggregation",
+      "id": "centralized-logs",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    },
+    {
+      "carousel": "Observability patterns",
+      "slide": 16,
+      "label": "Synthetic Monitoring",
+      "id": "synthetic-monitoring",
+      "domain": "observability-operations",
+      "status": "source-verified"
+    }
+  ],
+  "cards": [
+    {
+      "domain": "architecture-resilience",
+      "id": "api-gateway",
+      "title": "API Gateway"
+    },
+    {
+      "domain": "architecture-resilience",
+      "id": "service-discovery",
+      "title": "Service Discovery"
+    },
+    {
+      "domain": "architecture-resilience",
+      "id": "circuit-breaker",
+      "title": "Circuit Breaker"
+    },
+    {
+      "domain": "architecture-resilience",
+      "id": "backend-for-frontend",
+      "title": "Backend for Frontend"
+    },
+    {
+      "domain": "architecture-resilience",
+      "id": "bulkhead",
+      "title": "Bulkhead"
+    },
+    {
+      "domain": "architecture-resilience",
+      "id": "aggregator",
+      "title": "Aggregator"
+    },
+    {
+      "domain": "architecture-resilience",
+      "id": "hexagonal-architecture",
+      "title": "Hexagonal Architecture"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "database-per-service",
+      "title": "Database per Service"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "saga",
+      "title": "Saga"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "cqrs",
+      "title": "CQRS"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "event-sourcing",
+      "title": "Event Sourcing"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "snapshot",
+      "title": "Snapshot"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "temporal-data",
+      "title": "Temporal Data"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "inbox-pattern",
+      "title": "Inbox Pattern"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "transactional-outbox",
+      "title": "Transactional Outbox"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "backpressure",
+      "title": "Backpressure"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "work-queue",
+      "title": "Work Queue"
+    },
+    {
+      "domain": "data-messaging",
+      "id": "soft-delete",
+      "title": "Soft Delete"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "sidecar",
+      "title": "Sidecar"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "service-mesh",
+      "title": "Service Mesh"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "strangler-fig",
+      "title": "Strangler Fig"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "externalized-config",
+      "title": "Externalized Config"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "failover",
+      "title": "Failover"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "consistent-hashing",
+      "title": "Consistent Hashing"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "blue-green-deployment",
+      "title": "Blue-Green Deployment"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "distributed-cache",
+      "title": "Distributed Cache"
+    },
+    {
+      "domain": "infrastructure-delivery",
+      "id": "anti-corruption-layer",
+      "title": "Anti-Corruption Layer"
+    },
+    {
+      "domain": "object-design",
+      "id": "single-responsibility",
+      "title": "Single Responsibility Principle"
+    },
+    {
+      "domain": "object-design",
+      "id": "open-closed",
+      "title": "Open/Closed Principle"
+    },
+    {
+      "domain": "object-design",
+      "id": "liskov-substitution",
+      "title": "Liskov Substitution Principle"
+    },
+    {
+      "domain": "object-design",
+      "id": "interface-segregation",
+      "title": "Interface Segregation Principle"
+    },
+    {
+      "domain": "object-design",
+      "id": "dependency-inversion",
+      "title": "Dependency Inversion Principle"
+    },
+    {
+      "domain": "object-design",
+      "id": "singleton",
+      "title": "Singleton"
+    },
+    {
+      "domain": "object-design",
+      "id": "factory-method",
+      "title": "Factory Method"
+    },
+    {
+      "domain": "object-design",
+      "id": "builder",
+      "title": "Builder"
+    },
+    {
+      "domain": "object-design",
+      "id": "adapter",
+      "title": "Adapter"
+    },
+    {
+      "domain": "object-design",
+      "id": "decorator",
+      "title": "Decorator"
+    },
+    {
+      "domain": "object-design",
+      "id": "facade",
+      "title": "Facade"
+    },
+    {
+      "domain": "object-design",
+      "id": "proxy",
+      "title": "Proxy"
+    },
+    {
+      "domain": "object-design",
+      "id": "strategy",
+      "title": "Strategy"
+    },
+    {
+      "domain": "object-design",
+      "id": "observer",
+      "title": "Observer"
+    },
+    {
+      "domain": "object-design",
+      "id": "command",
+      "title": "Command"
+    },
+    {
+      "domain": "object-design",
+      "id": "state",
+      "title": "State"
+    },
+    {
+      "domain": "object-design",
+      "id": "template-method",
+      "title": "Template Method"
+    },
+    {
+      "domain": "object-design",
+      "id": "chain-of-responsibility",
+      "title": "Chain of Responsibility"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "structured-logging",
+      "title": "Structured Logging"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "log-levels-sampling",
+      "title": "Log Levels and Sampling"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "correlation-ids",
+      "title": "Correlation IDs"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "distributed-tracing",
+      "title": "Distributed Tracing"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "trace-context-propagation",
+      "title": "Trace Context Propagation"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "four-golden-signals",
+      "title": "Four Golden Signals"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "red-method",
+      "title": "RED Method"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "use-method",
+      "title": "USE Method"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "percentiles",
+      "title": "Percentiles Over Averages"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "liveness-readiness",
+      "title": "Health Check API and Liveness/Readiness"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "symptom-alerts",
+      "title": "Symptom Alerts"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "slis-slos-error-budgets",
+      "title": "SLIs, SLOs, and Error Budgets"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "dashboards-as-code",
+      "title": "Dashboards as Code"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "centralized-logs",
+      "title": "Centralized Logs"
+    },
+    {
+      "domain": "observability-operations",
+      "id": "synthetic-monitoring",
+      "title": "Synthetic Monitoring"
+    }
+  ]
+}

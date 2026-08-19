@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "tribunal_id": "{{tribunal_id}}",
+  "tie_break": {
+    "algorithm": "sha256",
+    "seed": "{{precommitted_seed}}",
+    "commitment_sha256": "{{sha256_of_tribunal_id_nul_seed}}"
+  },
+  "candidate_plans": [
+    "{{sealed_melchior_plan}}",
+    "{{sealed_balthasar_plan}}",
+    "{{sealed_casper_plan}}"
+  ],
+  "comparative_deliberations": [
+    "{{melchior_comparison}}",
+    "{{balthasar_comparison}}",
+    "{{casper_comparison}}"
+  ],
+  "sealed_pairwise_ballots": [
+    "{{three_ballots_for_melchior_v_balthasar}}",
+    "{{three_ballots_for_melchior_v_casper}}",
+    "{{three_ballots_for_balthasar_v_casper}}"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pairwise-ballot.schema.json",
+  "title": "MAGI Sealed Pairwise Ballot",
+  "type": "object",
+  "required": ["tribunal_id", "ballot_id", "core_name", "matchup_id", "candidate_plan_ids", "selected_plan_id", "rationale", "sealed"],
+  "additionalProperties": false,
+  "properties": {
+    "tribunal_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$" },
+    "ballot_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9:._-]{2,255}$" },
+    "core_name": { "enum": ["Melchior-1", "Balthasar-2", "Casper-3"] },
+    "matchup_id": { "enum": ["melchior-v-balthasar", "melchior-v-casper", "balthasar-v-casper"] },
+    "candidate_plan_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": { "enum": ["melchior-plan", "balthasar-plan", "casper-plan"] }
+    },
+    "selected_plan_id": { "enum": ["melchior-plan", "balthasar-plan", "casper-plan"] },
+    "rationale": { "type": "string", "minLength": 1 },
+    "sealed": { "const": true }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "astra-os",
+  "description": "Front-loaded software factory harness. Five gates from rough intent to proven code, driven end to end by one headless agent CLI, with adversarial audit, contract-scoped roles, and a retro review console.",
+  "author": {
+    "name": "Jamin Echols",
+    "url": "https://github.com/justjammin"
+  },
+  "homepage": "https://github.com/justjammin/astra-os",
+  "repository": "https://github.com/justjammin/astra-os",
+  "license": "Apache-2.0",
+  "keywords": ["agents", "harness", "software-factory", "orchestration", "claude-code", "codex", "droid"],
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "agents": "./agents/",
+  "codex": {
+    "displayName": "Astra OS",
+    "shortDescription": "Five gates from intent to proven code, driven by one headless agent CLI.",
+    "category": "Coding"
+  }
+}

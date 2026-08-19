@@ -1,0 +1,5 @@
+test/
+.playwright-mcp/
+.astra/
+*.log
+assets/screens/

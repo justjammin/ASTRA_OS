@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "tribunal-submission.schema.json",
+  "title": "MAGI Tribunal Submission",
+  "type": "object",
+  "required": ["schema_version", "tribunal_id", "tie_break", "candidate_plans", "comparative_deliberations", "sealed_pairwise_ballots"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "tribunal_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$" },
+    "tie_break": {
+      "type": "object",
+      "required": ["algorithm", "seed", "commitment_sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": { "const": "sha256" },
+        "seed": { "type": "string", "minLength": 8, "maxLength": 128 },
+        "commitment_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "candidate_plans": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "candidate-plan.schema.json" } },
+    "comparative_deliberations": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "comparative-deliberation.schema.json" } },
+    "sealed_pairwise_ballots": { "type": "array", "minItems": 9, "maxItems": 9, "items": { "$ref": "pairwise-ballot.schema.json" } }
+  }
+}

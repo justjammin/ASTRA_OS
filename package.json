@@ -1,0 +1,61 @@
+{
+  "name": "@ninjamin/astra-os",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Astra OS — a portable agent harness that drives one headless coding CLI (claude, droid, opencode, hermes, codex) through five front-loaded software-factory gates: product intent, architecture with adversarial audit, program design contracts, DAG planning with scoped agent roles, and testing-trophy execution streamed to a retro visualizer.",
+  "bin": {
+    "astra": "bin/astra.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "viz": "node visualizer/server.mjs"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "visualizer/",
+    "skills/",
+    "commands/",
+    "agents/",
+    "assets/astra-os.svg",
+    ".claude-plugin/",
+    ".codex-plugin/",
+    "plugin.source.json",
+    "README.md",
+    "LICENSE",
+    "assets/astra-os-mark.svg"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "agents",
+    "harness",
+    "software-factory",
+    "claude-code",
+    "codex",
+    "droid",
+    "opencode",
+    "orchestration",
+    "plugin"
+  ],
+  "author": {
+    "name": "Jamin Echols",
+    "url": "https://github.com/justjammin"
+  },
+  "license": "Apache-2.0",
+  "peerDependenciesMeta": {
+    "@langchain/langgraph": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@langchain/langgraph": "^1.4.10"
+  },
+  "peerDependencies": {
+    "@langchain/langgraph": "^1.4.10"
+  }
+}

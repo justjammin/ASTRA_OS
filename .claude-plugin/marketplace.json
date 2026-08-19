@@ -1,0 +1,14 @@
+{
+  "name": "astra-os",
+  "owner": {
+    "name": "Jamin Echols",
+    "url": "https://github.com/justjammin"
+  },
+  "plugins": [
+    {
+      "name": "astra-os",
+      "source": "./",
+      "description": "Five-gate software factory harness with adversarial audit, contract-scoped agent roles, and a retro review console."
+    }
+  ]
+}

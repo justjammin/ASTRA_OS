@@ -1,0 +1,18 @@
+{
+  "name": "astra-os",
+  "version": "0.1.0",
+  "description": "Front-loaded software factory harness. Drives one headless coding CLI through five gated phases with human approval between each, adversarial audit at architecture, contract-scoped agent roles, and Testing Trophy execution streamed to a retro visualizer.",
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "agents": "./agents/",
+  "author": {
+    "name": "Jamin Echols",
+    "url": "https://github.com/justjammin"
+  },
+  "license": "Apache-2.0",
+  "interface": {
+    "displayName": "Astra OS",
+    "shortDescription": "Five gates from intent to proven code, driven by one headless agent CLI.",
+    "category": "Coding"
+  }
+}

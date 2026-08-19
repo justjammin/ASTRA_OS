@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "candidate-plan.schema.json",
+  "title": "MAGI Candidate Plan",
+  "type": "object",
+  "required": ["tribunal_id", "candidate_plan_id", "author_core", "authored_in_isolation", "title", "proposal"],
+  "additionalProperties": false,
+  "properties": {
+    "tribunal_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$" },
+    "candidate_plan_id": { "enum": ["melchior-plan", "balthasar-plan", "casper-plan"] },
+    "author_core": { "enum": ["Melchior-1", "Balthasar-2", "Casper-3"] },
+    "authored_in_isolation": { "const": true },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "proposal": {
+      "type": "object",
+      "required": ["objective", "steps", "success_criteria", "risks"],
+      "additionalProperties": false,
+      "properties": {
+        "objective": { "type": "string", "minLength": 1 },
+        "steps": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "success_criteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "risks": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "astra-os/dag-execution.schema.json",
+  "title": "Astra Gate 5 — DAG Execution State",
+  "description": "Live execution state written on every node transition and streamed to the visualizer over SSE.",
+  "type": "object",
+  "required": ["meta", "status", "nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["slug", "agent"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "intent": { "type": "string" },
+        "agent": { "type": "string" },
+        "startedAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "finishedAt": { "type": "string" },
+        "concurrency": { "type": "integer" },
+        "runtime": { "type": "string" },
+        "sliceFilter": { "type": "string" }
+      }
+    },
+    "status": { "enum": ["idle", "running", "passed", "failed", "blocked"] },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "kind", "slice", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "kind": { "enum": ["implement", "static", "unit", "integration", "e2e"] },
+          "slice": { "type": "string" },
+          "role": { "type": "string" },
+          "deps": { "type": "array", "items": { "type": "string" } },
+          "status": { "enum": ["pending", "running", "passed", "failed", "skipped", "blocked"] },
+          "attempts": { "type": "integer" },
+          "startedAt": { "type": "string" },
+          "finishedAt": { "type": "string" },
+          "durationMs": { "type": "integer" },
+          "exitCode": { "type": "integer" },
+          "summary": { "type": "string" },
+          "logPath": { "type": "string" }
+        }
+      }
+    },
+    "slices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "tracer": { "type": "boolean" },
+          "status": { "enum": ["pending", "running", "passed", "failed", "blocked"] }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ts", "level", "message"],
+        "additionalProperties": false,
+        "properties": {
+          "ts": { "type": "string" },
+          "level": { "enum": ["info", "warn", "error"] },
+          "node": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}
