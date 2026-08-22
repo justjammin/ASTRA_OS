@@ -37,7 +37,7 @@ MAGI is opt-in and never auto-enabled. Astra may *recommend* it for P0 risk, irr
 ## Required workflow
 
 1. **Calibrate.** Name the artifact under review, the change's blast radius, and the reversibility. Record the fixed point (a commit for code review, an artifact path for design review). No fixed point, no review.
-2. **Route.** Map the observed pressure to catalog domains: `references/architecture-resilience.md`, `references/data-messaging.md`, `references/object-design.md`, `references/observability-operations.md`, `references/infrastructure-delivery.md`. `references/catalog.json` is the canonical id index; `references/coverage-index.md` says what is covered.
+2. **Route.** Map the observed pressure to catalog domains. Classic software patterns: `references/architecture-resilience.md`, `references/data-messaging.md`, `references/object-design.md`, `references/observability-operations.md`, `references/infrastructure-delivery.md`. AI-agent / LLM patterns: `references/agentic-workflow.md`, `references/agentic-reasoning.md`, `references/agentic-coordination.md`, `references/agentic-control.md`, `references/agentic-knowledge.md`. `references/catalog.json` is the canonical id index; `references/coverage-index.md` says what is covered.
 3. **Judge.** Apply `references/judge-protocol.md`: decision standard, evidence ladder, grounding taxonomy (`claim` needs `file:line`, `citation` needs a primary URL, `guess` needs a promotion path and is always low confidence), the eight adversarial passes, and the `Apply` / `Reject` / `Investigate` verdict rule.
 4. **Report.** Write the artifact Astra expects for the gate you are serving (below). Every finding names the failure, the proof, the severity, and the smallest fix.
 

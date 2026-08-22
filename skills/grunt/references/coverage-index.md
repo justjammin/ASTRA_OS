@@ -102,3 +102,67 @@ Six covers and three explicit CTA slides are excluded. Three additional closing 
 - Repeated canonical IDs: `api-gateway`, `backend-for-frontend`, `bulkhead`, `circuit-breaker`, `command`, `distributed-tracing`, `liveness-readiness`, `service-mesh`, `sidecar`
 - `Health Check API` and `Liveness & Readiness Probes` normalize to `liveness-readiness` because both are judged by the action a platform takes on the signal.
 - The combined source label `Inbox-Outbox Pattern` maps to the consumer-side `inbox-pattern`; the separate advanced-backend `Outbox Pattern` maps to `transactional-outbox`.
+
+
+---
+
+# Agentic Patterns Coverage
+
+Second corpus: `baswe-agentic-design-patterns-guide` (local PDF, 2026 edition, 48pp). AI-agent / LLM patterns, kept in their own `agentic-*` domains, separate from the classic carousel catalog above. Load with the judge protocol.
+
+## Coverage
+
+| Part / Section | Page | Original label | Canonical concept ID | Domain | Verification status |
+|---|---:|---|---|---|---|
+| The five core patterns | 9 | Tool use / ReAct | `tool-use-react` | agentic-workflow | source-verified |
+| The five core patterns | 11 | Planning | `planning` | agentic-reasoning | source-verified |
+| The five core patterns | 14 | Reflection / critic | `reflection` | agentic-workflow | source-verified |
+| The five core patterns | 16 | Routing | `routing` | agentic-control | source-verified |
+| The five core patterns | 18 | Multi-agent / supervisor-worker | `multi-agent-supervisor` | agentic-coordination | source-verified |
+| Workflow patterns | 21 | Prompt chaining | `prompt-chaining` | agentic-workflow | source-verified |
+| Workflow patterns | 22 | Parallelization: sectioning and voting | `parallelization` | agentic-workflow | source-verified |
+| Workflow patterns | 22 | Orchestrator-workers | `orchestrator-workers` | agentic-workflow | source-verified |
+| Workflow patterns | 22 | Evaluator-optimizer | `evaluator-optimizer` | agentic-workflow | source-verified |
+| Reasoning patterns | 23 | Plan-and-execute and ReWOO | `plan-and-execute-rewoo` | agentic-reasoning | source-verified |
+| Reasoning patterns | 23 | Reflexion | `reflexion` | agentic-reasoning | source-verified |
+| Reasoning patterns | 23 | Tree of thoughts and search | `tree-of-thoughts` | agentic-reasoning | source-verified |
+| Reasoning patterns | 23 | Self-ask and decomposition | `self-ask` | agentic-reasoning | source-verified |
+| Reasoning patterns | 23 | Code as action (CodeAct) | `code-as-action` | agentic-reasoning | source-verified |
+| Coordination patterns | 24 | Handoffs and swarms | `handoffs-swarms` | agentic-coordination | source-verified |
+| Coordination patterns | 24 | Hierarchical agents | `hierarchical-agents` | agentic-coordination | source-verified |
+| Coordination patterns | 24 | Blackboard and shared state | `blackboard` | agentic-coordination | source-verified |
+| Coordination patterns | 24 | Debate and consensus | `debate-consensus` | agentic-coordination | source-verified |
+| Control patterns | 25 | Human-in-the-loop | `human-in-the-loop` | agentic-control | source-verified |
+| Control patterns | 25 | Guardrails | `guardrails` | agentic-control | source-verified |
+| Control patterns | 26 | State machines and graphs | `state-machines-graphs` | agentic-control | source-verified |
+| Control patterns | 26 | Termination and budgets | `termination-budgets` | agentic-control | source-verified |
+| Knowledge patterns | 26 | Memory | `memory` | agentic-knowledge | source-verified |
+| Knowledge patterns | 27 | Agentic RAG | `agentic-rag` | agentic-knowledge | source-verified |
+| Knowledge patterns | 27 | Context compaction | `context-compaction` | agentic-knowledge | source-verified |
+
+Each pattern also recurs once in the **Pattern selection cheat sheet** (p27–28), recorded as a second occurrence in `catalog.json`.
+
+## Excluded non-pattern content
+
+| Part | Pages | Classification |
+|---|---:|---|
+| Cover / intro / contents | 1–4 | cover, CTA, TOC |
+| Part 1 — Foundations | 5–8 | concept + vocabulary glossary |
+| Part 4 — Designing agents | 30–35 | engineering guidance |
+| Part 5 — Evaluating agents | 36–39 | eval guidance |
+| Part 6 — Deploying agents | 40–43 | deploy/runtime guidance |
+| Part 7 — Putting it together | 44–48 | reference arch, checklist, interview, CTA |
+| Community CTAs | 2, 20, 29 | cta |
+
+Patterns live only in Part 2 (five core) and Part 3 (twenty more). Parts 1 and 4–7 are concept, engineering, eval, deploy, or closing content, not judge-able patterns.
+
+## Normalization
+
+- Occurrences: 50 (25 primary + 25 cheat-sheet recap).
+- Canonical concepts: 25.
+- `evaluator-optimizer` is the productized, dedicated-evaluator form of `reflection`; both keep distinct cards (agentic-workflow).
+- `reflexion` = `reflection` plus episodic `memory`; it stays its own reasoning card.
+- `orchestrator-workers` (dynamic, runtime split) is distinct from static `parallelization` and from the coordination-level `multi-agent-supervisor`.
+- `tree-of-thoughts` folds in **LATS** (Language Agent Tree Search) rather than giving it a separate ID.
+- `memory` covers all four subtypes (working / episodic / semantic / procedural) under one card.
+- `guardrails` and `termination-budgets` are always-on production controls; their cards judge presence, adequacy, and bypass rather than adoption.
