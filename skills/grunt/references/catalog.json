@@ -552,6 +552,456 @@
       "id": "synthetic-monitoring",
       "domain": "observability-operations",
       "status": "source-verified"
+    },
+    {
+      "carousel": "The five core patterns",
+      "slide": 9,
+      "label": "Tool use / ReAct",
+      "id": "tool-use-react",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "The five core patterns",
+      "slide": 11,
+      "label": "Planning",
+      "id": "planning",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "The five core patterns",
+      "slide": 14,
+      "label": "Reflection / critic",
+      "id": "reflection",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "The five core patterns",
+      "slide": 16,
+      "label": "Routing",
+      "id": "routing",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "The five core patterns",
+      "slide": 18,
+      "label": "Multi-agent / supervisor-worker",
+      "id": "multi-agent-supervisor",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Workflow patterns",
+      "slide": 21,
+      "label": "Prompt chaining",
+      "id": "prompt-chaining",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Workflow patterns",
+      "slide": 22,
+      "label": "Parallelization: sectioning and voting",
+      "id": "parallelization",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Workflow patterns",
+      "slide": 22,
+      "label": "Orchestrator-workers",
+      "id": "orchestrator-workers",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Workflow patterns",
+      "slide": 22,
+      "label": "Evaluator-optimizer",
+      "id": "evaluator-optimizer",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Reasoning patterns",
+      "slide": 23,
+      "label": "Plan-and-execute and ReWOO",
+      "id": "plan-and-execute-rewoo",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Reasoning patterns",
+      "slide": 23,
+      "label": "Reflexion",
+      "id": "reflexion",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Reasoning patterns",
+      "slide": 23,
+      "label": "Tree of thoughts and search",
+      "id": "tree-of-thoughts",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Reasoning patterns",
+      "slide": 23,
+      "label": "Self-ask and decomposition",
+      "id": "self-ask",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Reasoning patterns",
+      "slide": 23,
+      "label": "Code as action (CodeAct)",
+      "id": "code-as-action",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Coordination patterns",
+      "slide": 24,
+      "label": "Handoffs and swarms",
+      "id": "handoffs-swarms",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Coordination patterns",
+      "slide": 24,
+      "label": "Hierarchical agents",
+      "id": "hierarchical-agents",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Coordination patterns",
+      "slide": 24,
+      "label": "Blackboard and shared state",
+      "id": "blackboard",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Coordination patterns",
+      "slide": 24,
+      "label": "Debate and consensus",
+      "id": "debate-consensus",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Control patterns",
+      "slide": 25,
+      "label": "Human-in-the-loop",
+      "id": "human-in-the-loop",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Control patterns",
+      "slide": 25,
+      "label": "Guardrails",
+      "id": "guardrails",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Control patterns",
+      "slide": 26,
+      "label": "State machines and graphs",
+      "id": "state-machines-graphs",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Control patterns",
+      "slide": 26,
+      "label": "Termination and budgets",
+      "id": "termination-budgets",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Knowledge patterns",
+      "slide": 26,
+      "label": "Memory",
+      "id": "memory",
+      "domain": "agentic-knowledge",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Knowledge patterns",
+      "slide": 27,
+      "label": "Agentic RAG",
+      "id": "agentic-rag",
+      "domain": "agentic-knowledge",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Knowledge patterns",
+      "slide": 27,
+      "label": "Context compaction",
+      "id": "context-compaction",
+      "domain": "agentic-knowledge",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Tool use / ReAct",
+      "id": "tool-use-react",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Planning",
+      "id": "planning",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Reflection / critic",
+      "id": "reflection",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Routing",
+      "id": "routing",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Multi-agent / supervisor-worker",
+      "id": "multi-agent-supervisor",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Prompt chaining",
+      "id": "prompt-chaining",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Parallelization: sectioning and voting",
+      "id": "parallelization",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Orchestrator-workers",
+      "id": "orchestrator-workers",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Evaluator-optimizer",
+      "id": "evaluator-optimizer",
+      "domain": "agentic-workflow",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Plan-and-execute and ReWOO",
+      "id": "plan-and-execute-rewoo",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Reflexion",
+      "id": "reflexion",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Tree of thoughts and search",
+      "id": "tree-of-thoughts",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Self-ask and decomposition",
+      "id": "self-ask",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Code as action (CodeAct)",
+      "id": "code-as-action",
+      "domain": "agentic-reasoning",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Handoffs and swarms",
+      "id": "handoffs-swarms",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Hierarchical agents",
+      "id": "hierarchical-agents",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Blackboard and shared state",
+      "id": "blackboard",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Debate and consensus",
+      "id": "debate-consensus",
+      "domain": "agentic-coordination",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Human-in-the-loop",
+      "id": "human-in-the-loop",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Guardrails",
+      "id": "guardrails",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "State machines and graphs",
+      "id": "state-machines-graphs",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Termination and budgets",
+      "id": "termination-budgets",
+      "domain": "agentic-control",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Memory",
+      "id": "memory",
+      "domain": "agentic-knowledge",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Agentic RAG",
+      "id": "agentic-rag",
+      "domain": "agentic-knowledge",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
+    },
+    {
+      "carousel": "Pattern selection cheat sheet",
+      "slide": 27,
+      "label": "Context compaction",
+      "id": "context-compaction",
+      "domain": "agentic-knowledge",
+      "status": "source-verified",
+      "source": "baswe-agentic-design-patterns-guide"
     }
   ],
   "cards": [
@@ -854,6 +1304,131 @@
       "domain": "observability-operations",
       "id": "synthetic-monitoring",
       "title": "Synthetic Monitoring"
+    },
+    {
+      "domain": "agentic-workflow",
+      "id": "tool-use-react",
+      "title": "Tool Use / ReAct"
+    },
+    {
+      "domain": "agentic-reasoning",
+      "id": "planning",
+      "title": "Planning"
+    },
+    {
+      "domain": "agentic-workflow",
+      "id": "reflection",
+      "title": "Reflection"
+    },
+    {
+      "domain": "agentic-control",
+      "id": "routing",
+      "title": "Routing"
+    },
+    {
+      "domain": "agentic-coordination",
+      "id": "multi-agent-supervisor",
+      "title": "Multi-Agent / Supervisor-Worker"
+    },
+    {
+      "domain": "agentic-workflow",
+      "id": "prompt-chaining",
+      "title": "Prompt Chaining"
+    },
+    {
+      "domain": "agentic-workflow",
+      "id": "parallelization",
+      "title": "Parallelization (Sectioning and Voting)"
+    },
+    {
+      "domain": "agentic-workflow",
+      "id": "orchestrator-workers",
+      "title": "Orchestrator-Workers"
+    },
+    {
+      "domain": "agentic-workflow",
+      "id": "evaluator-optimizer",
+      "title": "Evaluator-Optimizer"
+    },
+    {
+      "domain": "agentic-reasoning",
+      "id": "plan-and-execute-rewoo",
+      "title": "Plan-and-Execute / ReWOO"
+    },
+    {
+      "domain": "agentic-reasoning",
+      "id": "reflexion",
+      "title": "Reflexion"
+    },
+    {
+      "domain": "agentic-reasoning",
+      "id": "tree-of-thoughts",
+      "title": "Tree of Thoughts and Search"
+    },
+    {
+      "domain": "agentic-reasoning",
+      "id": "self-ask",
+      "title": "Self-Ask and Decomposition"
+    },
+    {
+      "domain": "agentic-reasoning",
+      "id": "code-as-action",
+      "title": "Code as Action (CodeAct)"
+    },
+    {
+      "domain": "agentic-coordination",
+      "id": "handoffs-swarms",
+      "title": "Handoffs and Swarms"
+    },
+    {
+      "domain": "agentic-coordination",
+      "id": "hierarchical-agents",
+      "title": "Hierarchical Agents"
+    },
+    {
+      "domain": "agentic-coordination",
+      "id": "blackboard",
+      "title": "Blackboard and Shared State"
+    },
+    {
+      "domain": "agentic-coordination",
+      "id": "debate-consensus",
+      "title": "Debate and Consensus"
+    },
+    {
+      "domain": "agentic-control",
+      "id": "human-in-the-loop",
+      "title": "Human-in-the-Loop"
+    },
+    {
+      "domain": "agentic-control",
+      "id": "guardrails",
+      "title": "Guardrails"
+    },
+    {
+      "domain": "agentic-control",
+      "id": "state-machines-graphs",
+      "title": "State Machines and Graphs"
+    },
+    {
+      "domain": "agentic-control",
+      "id": "termination-budgets",
+      "title": "Termination and Budgets"
+    },
+    {
+      "domain": "agentic-knowledge",
+      "id": "memory",
+      "title": "Memory"
+    },
+    {
+      "domain": "agentic-knowledge",
+      "id": "agentic-rag",
+      "title": "Agentic RAG"
+    },
+    {
+      "domain": "agentic-knowledge",
+      "id": "context-compaction",
+      "title": "Context Compaction"
     }
   ]
 }

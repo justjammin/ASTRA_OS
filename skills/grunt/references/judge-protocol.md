@@ -64,6 +64,16 @@ Every candidate row names signal, canonical ID, verdict, evidence, risk, and sim
 - Distributed cache: replication, invalidation, eviction, and failover can return stale data or lose acknowledged cache writes.
 - Rollback: code rollback does not reverse incompatible schemas, external effects, or data written by the new version.
 
+Agentic (LLM-agent) guarantees:
+
+- Termination: every agent loop needs multiple stop conditions (step cap, token/cost budget, wall-clock, repeated-call detection) and a defined partial result. An unbounded loop is a P0/P1-class risk, not a tuning detail.
+- Guardrails: an input/action/output guard reduces risk only if it enforces something; a guard that checks nothing, or duplicates an upstream control, is theater. Guards must run cheaply and in parallel, and be tested for bypass.
+- Tool use and injection: untrusted content plus tool access plus data exfiltration is the lethal trifecta. Prompt injection can turn any tool call hostile; least-privilege tools and allow-lists still need duplicate-safe, idempotent effects.
+- Memory: writes are the risk. Saving everything leaks and bloats; saving nothing useful is silent failure. Stored memory can be stale, contradictory, or contain retained PII.
+- Retrieval grounding: an answer with citations is not a grounded answer. Require a grounding check that the cited context actually supports the claim; agentic retrieval loops still need bounds.
+- Human-in-the-loop: gate irreversible or expensive actions (payments, deletions, sends) until production evidence earns a relaxed gate. Gate fatigue turns approvals into rubber stamps.
+- Non-determinism: one green run is not proof. Agent behavior varies across trajectories; require eval sets and trajectory tests, not a single happy-path trace.
+
 ## Better-approach test
 
 Recommend an alternative only when it:

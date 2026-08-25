@@ -43,6 +43,7 @@ const COMMAND_FILES = ["astra.md", "grunt.md"];
 const HOSTS = [
   { id: "claude", skills: [".claude", "skills"], commands: [".claude", "commands"] },
   { id: "codex", skills: [".codex", "skills"], commands: [".codex", "prompts"] },
+  { id: "droid", skills: [".factory", "skills"], commands: [".factory", "commands"] },
 ];
 
 function parseArgs(argv) {
