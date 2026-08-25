@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -211,6 +211,9 @@ test("log feed tails the newest transcript, capped at 50 lines", async () => {
     await writeFile(join(root, "logs/gate-1-product.log"), "old gate\n");
     const lines = Array.from({ length: 120 }, (_, i) => `line ${i + 1}`);
     await writeFile(join(root, "logs/gate-2-architecture.log"), `${lines.join("\n")}\n`);
+    const now = Date.now() / 1000;
+    await utimes(join(root, "logs/gate-1-product.log"), now - 2, now - 2);
+    await utimes(join(root, "logs/gate-2-architecture.log"), now, now);
 
     await withServer(async ({ url }) => {
       const state = await (await fetch(`${url}/api/state`)).json();
