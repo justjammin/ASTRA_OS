@@ -14,7 +14,7 @@
       "properties": {
         "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
         "intent": { "type": "string", "minLength": 1 },
-        "agent": { "enum": ["claude", "droid", "opencode", "hermes", "codex"] },
+        "agent": { "enum": ["claude", "droid", "opencode", "hermes", "codex", "pi"] },
         "schemaVersion": { "type": "string" },
         "createdAt": { "type": "string" }
       }

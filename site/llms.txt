@@ -1,0 +1,29 @@
+# ASTRA OS
+
+> ASTRA OS is a portable agent harness for spec-driven software development.
+
+## What it is
+
+ASTRA drives a coding agent through five front-loaded software-factory gates. Each gate validates the artifact it leaves on disk, and human approval remains part of the transition.
+
+## The five gates
+
+1. Product Intent & Visual Spec
+2. Architecture & Adversarial Audit
+3. Program Design & Contract Hardening
+4. Graph Engineering & Agent Role Allocation
+5. Testing Trophy Execution
+
+## Runtime and adapters
+
+The bundled local runtime is the default. LangGraph is an optional peer runtime. Adapters cover Pi, Claude, Droid, OpenCode, Hermes, and Codex; the installed CLIs or Pi SDK provide the worker execution.
+
+## Review surface
+
+`astra viz` opens the retro review console. It renders saved Markdown and JSON artifacts, gate state, graph execution, and human response requests. ASTRA does not provide live broker telemetry in this static site; budget and policy decisions remain explicit operator decisions.
+
+## Links
+
+- Repository: https://github.com/justjammin/ASTRA_OS
+- Package: https://www.npmjs.com/package/@ninjamin/astra-os
+- License: Apache-2.0

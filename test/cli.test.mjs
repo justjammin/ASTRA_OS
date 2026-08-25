@@ -57,7 +57,7 @@ test("commands refuse without an active run", async () => {
 test("start writes the ledger, then gate/approve/advance walk the phases", async () => {
   const { dir, env } = await repo();
 
-  const started = await astra(["start", "add a widget", "--agent", "claude", "--judge", "magi"], { cwd: dir, env });
+  const started = await astra(["start", "add a widget", "--agent", "claude", "--judge", "magi", "--budget-tokens", "50000"], { cwd: dir, env });
   assert.equal(started.code, 0);
   assert.match(started.stdout, /ASTRA READY/);
   assert.match(started.stdout, /judge     magi/);
@@ -66,6 +66,10 @@ test("start writes the ledger, then gate/approve/advance walk the phases", async
   const ledger = JSON.parse(await readFile(join(root, "status.json"), "utf8"));
   assert.equal(ledger.phase, "product");
   assert.equal(ledger.meta.agent, "claude");
+  const session = JSON.parse(await readFile(join(root, "json", "session.json"), "utf8"));
+  assert.equal(session.harness, "claude");
+  assert.equal(session.interface, "tui");
+  assert.equal(session.budget.budgetTokens, 50000);
   assert.match(await readFile(join(root, "00-status.md"), "utf8"), /Product Intent & Visual Spec/);
 
   const second = await astra(["start", "another idea"], { cwd: dir, env });
@@ -141,4 +145,16 @@ test("unknown gate and unknown agent are rejected with usage-level errors", asyn
   const badGate = await astra(["run", "--gate", "nope"], { cwd: dir, env });
   assert.equal(badGate.code, 1);
   assert.match(badGate.stderr, /unknown gate/);
+});
+
+test("start validates budget and session reports the harness route", async () => {
+  const { dir, env } = await repo();
+  const invalid = await astra(["start", "budget demo", "--budget-tokens", "nope"], { cwd: dir, env });
+  assert.equal(invalid.code, 1);
+  assert.match(invalid.stderr, /positive integer/);
+  await astra(["start", "budget demo", "--agent", "codex", "--budget-tokens", "1000"], { cwd: dir, env });
+  const session = await astra(["session"], { cwd: dir, env });
+  assert.equal(session.code, 0);
+  assert.match(session.stdout, /session → codex → TUI/i);
+  assert.match(session.stdout, /0 \/ 1,000 tokens/);
 });

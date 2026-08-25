@@ -1,0 +1,14 @@
+{
+  "name": "astra-os-factory",
+  "version": "0.1.0",
+  "description": "Astra's five-gate software factory with a local MCP control surface.",
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "mcpServers": "./mcp.json",
+  "interface": {
+    "displayName": "Astra OS",
+    "shortDescription": "Human-gated product-to-proof workflow for coding agents.",
+    "category": "Coding"
+  }
+}
+

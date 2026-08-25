@@ -1,0 +1,18 @@
+{
+  "name": "ASTRA OS",
+  "short_name": "ASTRA",
+  "description": "A spec-driven software factory for coding-agent work.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0c0c05",
+  "theme_color": "#0c0c05",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+name: GitHub release Astra OS
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to release
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Test, package, and create GitHub release
+    runs-on: ubuntu-latest
+    environment:
+      name: npm-release
+    steps:
+      - name: Check out release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify version tag matches package
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: |
+          test "$RELEASE_TAG" = "v$(node -p "require('./package.json').version")" || {
+            echo "Tag $RELEASE_TAG does not match package version $(node -p "require('./package.json').version")" >&2
+            exit 1
+          }
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Pack npm artifact
+        run: |
+          npm pack --json > /tmp/astra-pack.json
+          package_tgz="$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/astra-pack.json', 'utf8'))[0].filename)")"
+          test -n "$package_tgz"
+          echo "PACKAGE_TGZ=$package_tgz" >> "$GITHUB_ENV"
+          echo "Packed $package_tgz"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" "$PACKAGE_TGZ" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Astra OS $RELEASE_TAG" \
+            --generate-notes

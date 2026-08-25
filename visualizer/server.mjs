@@ -14,6 +14,8 @@ import { fileURLToPath } from "node:url";
 
 import { GATES, GATE_IDS } from "../lib/gates.mjs";
 import { REL } from "../lib/paths.mjs";
+import { readInteraction, respondInteraction } from "../lib/policy.mjs";
+import { parseRuntime, FeedbackBody } from "../lib/schemas/runtime.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(HERE, "..");
@@ -225,6 +227,7 @@ async function readLogFeed(root) {
 export async function aggregateState(runRoot) {
   const root = resolve(runRoot);
   const ledger = await readArtifact(root, REL.ledger);
+  const session = await readArtifact(root, REL.session);
   const artifacts = {};
   for (const [key, relPath] of Object.entries(ARTIFACT_PATHS)) {
     artifacts[key] = await readArtifact(root, relPath);
@@ -246,11 +249,13 @@ export async function aggregateState(runRoot) {
     runRoot: root,
     slug: typeof ledger?.meta?.slug === "string" ? ledger.meta.slug : basename(root),
     ledger,
+    session,
     gates,
     artifacts,
     docs,
     markdown: await collectMarkdown(root),
     logFeed: await readLogFeed(root),
+    interaction: await readInteraction(root),
     mtimeMs: await collectMtimes(root),
   };
 }
@@ -289,26 +294,8 @@ async function readBody(req) {
 }
 
 function validateFeedback(body) {
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
-    return "body must be an object";
-  }
-  if (!GATE_IDS.includes(body.gate)) return `unknown gate "${String(body.gate)}"`;
-  if (!VALID_VERDICTS.has(body.verdict)) return `verdict must be approved or changes-requested`;
-  if (body.notes !== undefined && typeof body.notes !== "string") {
-    return "notes must be a string";
-  }
-  if (body.findings !== undefined && !Array.isArray(body.findings)) {
-    return "findings must be an array";
-  }
-  for (const finding of body.findings ?? []) {
-    if (!finding || typeof finding !== "object" || Array.isArray(finding)) {
-      return "each finding must be an object";
-    }
-    if (!VALID_SEVERITIES.has(finding.severity)) return "finding severity must be P0, P1, or P2";
-    if (typeof finding.claim !== "string") return "finding claim must be a string";
-    if (typeof finding.fix !== "string") return "finding fix must be a string";
-  }
-  return null;
+  const parsed = parseRuntime(FeedbackBody, body);
+  return parsed.ok ? null : parsed.errors.join("; ");
 }
 
 async function handleFeedback(req, res, runRoot) {
@@ -344,6 +331,22 @@ async function handleFeedback(req, res, runRoot) {
   await mkdir(dirname(target), { recursive: true });
   await writeFile(target, `${JSON.stringify(feedback, null, 2)}\n`, "utf8");
   jsonResponse(res, 200, { ok: true, path: target });
+}
+
+async function handleInteractionResponse(req, res, runRoot) {
+  let body;
+  try {
+    body = JSON.parse(await readBody(req));
+  } catch (error) {
+    errorResponse(res, error.statusCode ?? 400, "invalid_json", error.statusCode ? error.message : "request body must be valid JSON");
+    return;
+  }
+  const result = await respondInteraction(runRoot, body);
+  if (!result.ok) {
+    errorResponse(res, 400, "invalid_interaction_response", result.errors.join("; "));
+    return;
+  }
+  jsonResponse(res, 200, { ok: true, interaction: result.data });
 }
 
 function staticFile(pathname) {
@@ -383,6 +386,15 @@ async function handleRequest(req, res, runRoot, streamClients) {
       return;
     }
     await handleFeedback(req, res, runRoot);
+    return;
+  }
+
+  if (pathname === "/api/interaction/respond") {
+    if (req.method !== "POST") {
+      errorResponse(res, 405, "method_not_allowed", "POST required");
+      return;
+    }
+    await handleInteractionResponse(req, res, runRoot);
     return;
   }
 
@@ -578,10 +590,11 @@ async function runStandalone() {
   }
   const portArg = args.find((arg) => arg.startsWith("--port="));
   const port = Number(portArg?.slice("--port=".length) ?? 4319);
+  const shouldOpen = args.includes("--open");
   if (!Number.isInteger(port) || port < 0 || port > 65535) {
     throw new Error("port must be an integer from 0 to 65535");
   }
-  const visualizer = await startVisualizer({ runRoot, port });
+  const visualizer = await startVisualizer({ runRoot, port, open: shouldOpen });
   console.log(`astra: visualizer at ${visualizer.url}`);
   const shutdown = async () => {
     await visualizer.close();

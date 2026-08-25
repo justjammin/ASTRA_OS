@@ -18,6 +18,7 @@ import { dirname, basename } from "node:path";
 const prompt = process.argv.slice(1).join(" ");
 const slug = process.env.ASTRA_TEST_SLUG;
 const paths = [...new Set(prompt.match(/[\\w./-]*\\.astra\\/[\\w-]+\\/[\\w./-]+/g) ?? [])];
+const judgeRun = paths.some((path) => basename(path).startsWith("audit-"));
 
 const content = {
   "01-product.md": "# Widget\\n\\n" + "Plain language product detail. ".repeat(40),
@@ -55,6 +56,7 @@ const content = {
 
 for (const path of paths) {
   const name = basename(path);
+  if (judgeRun && !name.startsWith("audit-")) continue;
   let body = content[name];
   if (!body && name.startsWith("audit-")) {
     const persona = name.slice(6, -5);

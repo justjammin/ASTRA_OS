@@ -821,6 +821,12 @@
       .review-button.changes:hover { color: var(--amber); border-color: var(--amber); }
       .feedback-state { min-height: 1.2em; color: var(--faint); font: .7rem/1.2 var(--mono); }
       .session-note { margin: 0 0 16px; padding: 11px 13px; color: var(--amber); background: color-mix(in oklch, var(--amber) 8%, transparent); border: 1px solid color-mix(in oklch, var(--amber) 58%, transparent); }
+      .session-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .session-stat { display: grid; gap: 8px; padding: 14px; background: color-mix(in oklch, var(--charred) 44%, transparent); border: 1px solid var(--line); }
+      .session-stat strong { color: var(--lime); font: .8rem/1.35 var(--mono); letter-spacing: .04em; }
+      .session-stat small { color: var(--ink-muted); font: .68rem/1.2 var(--mono); }
+      .session-budget { width: 100%; }
+      .session-grid > .table-wrap, .session-grid > .session-note { grid-column: 1 / -1; }
 
       @keyframes pulse {
         0%, 100% { opacity: 1; }
@@ -831,6 +837,8 @@
         .topbar { grid-template-columns: auto 1fr; }
         .topbar-tools { grid-column: 2; justify-self: end; }
         .gate-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .session-grid { grid-template-columns: 1fr; }
+        .session-grid > .table-wrap, .session-grid > .session-note { grid-column: auto; }
       }
 
       @media (max-width: 640px) {

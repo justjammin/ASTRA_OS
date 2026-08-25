@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c0c05" />
+    <meta
+      name="description"
+      content="ASTRA OS is a spec-driven software factory for coding agents: five front-loaded gates, explicit artifacts, bounded roles, and a review console that keeps the work legible."
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="Jamin Echols" />
+    <!-- Keep origin-relative metadata: the Cloudflare workers.dev deployment supplies the host. -->
+    <link rel="canonical" href="./" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ASTRA OS" />
+    <meta property="og:title" content="ASTRA OS // Make the agent earn its way to code" />
+    <meta
+      property="og:description"
+      content="A visible, gated software factory for coding-agent work. Product intent first. Architecture next. Artifacts all the way down."
+    />
+    <meta property="og:url" content="./" />
+    <meta property="og:image" content="./social-card.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ASTRA OS // Make the agent earn its way to code" />
+    <meta
+      name="twitter:description"
+      content="Five front-loaded gates for spec-driven software factory work."
+    />
+    <meta name="twitter:image" content="./social-card.svg" />
+    <title>ASTRA OS // Make the agent earn its way to code</title>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "name": "ASTRA OS",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Node.js",
+            "description": "A portable agent harness that drives a coding agent through five front-loaded software-factory gates and validates the artifacts each gate leaves on disk.",
+            "url": "./",
+            "downloadUrl": "https://www.npmjs.com/package/@ninjamin/astra-os",
+            "codeRepository": "https://github.com/justjammin/ASTRA_OS",
+            "license": "https://www.apache.org/licenses/LICENSE-2.0",
+            "author": {
+              "@type": "Person",
+              "name": "Jamin Echols",
+              "url": "https://github.com/justjammin"
+            }
+          },
+          {
+            "@type": "HowTo",
+            "name": "Start a gated ASTRA OS run",
+            "description": "Use the ASTRA CLI to start a run, move through its gates, and open the review console.",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Start with intent",
+                "text": "Run astra start with a plain-language change request."
+              },
+              {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Run the current gate",
+                "text": "Run astra run to generate and validate the current gate artifacts."
+              },
+              {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Approve the handoff",
+                "text": "Approve the gate and advance when the artifact is ready for the next stage."
+              },
+              {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Open the console",
+                "text": "Run astra viz to inspect the run as a retro review console."
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is ASTRA OS another coding agent?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. ASTRA OS is a portable harness around the coding agent you already use. It adds a gated process, artifact validation, bounded roles, and a review surface."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Which agent CLIs can ASTRA drive?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The bundled adapters cover Pi, Claude, Droid, OpenCode, Hermes, and Codex. Pi runs through its SDK; the other adapters spawn their installed CLIs."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What happens when a gate is not ready?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ASTRA names the missing or invalid artifact, stops the transition, and leaves the run available for a bounded rework loop or human decision."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can a non-technical stakeholder review the work?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Gate 1 is written for product intent and visual validation, and the review console renders the saved artifacts and document viewers for human inspection."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does ASTRA require LangGraph?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. The bundled local runtime is the default. LangGraph is an optional peer runtime with parity tests."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header" data-header>
+      <div class="container header-inner">
+        <a class="brand" href="#overview" aria-label="ASTRA OS home">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="brand-mark-letter">A</span>
+            <span class="brand-mark-letter brand-mark-letter--slash">/</span>
+          </span>
+          <span class="brand-name">ASTRA <span>OS</span></span>
+        </a>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="primary-navigation"
+          data-nav-toggle
+        >
+          <span class="sr-only">Toggle navigation</span>
+          <span aria-hidden="true">MENU</span>
+        </button>
+
+        <nav id="primary-navigation" class="primary-nav" aria-label="Primary navigation" data-nav>
+          <a href="#gates">Five gates</a>
+          <a href="#session">Session model</a>
+          <a href="#verification">Verification</a>
+          <a href="#faq">FAQ</a>
+          <a class="nav-install" href="https://www.npmjs.com/package/@ninjamin/astra-os" target="_blank" rel="noreferrer">
+            Install Astra <span aria-hidden="true">↗</span>
+          </a>
+        </nav>
+      </div>
+      <div class="header-line" aria-hidden="true"><span data-header-line></span></div>
+    </header>
+
+    <main id="main-content">
+      <section id="overview" class="hero section-shell" aria-labelledby="hero-title">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow hero-eyebrow"><span class="status-dot" aria-hidden="true"></span> SPEC-DRIVEN DEVELOPMENT / 001</p>
+            <h1 id="hero-title">Make the agent <em>earn</em> its way to code.</h1>
+            <p class="hero-lede">
+              ASTRA OS turns coding-agent work into a visible, gated software factory. Intent first. Design before code. Every handoff leaves an artifact someone can inspect.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="https://www.npmjs.com/package/@ninjamin/astra-os" target="_blank" rel="noreferrer">
+                Install Astra <span aria-hidden="true">↗</span>
+              </a>
+              <a class="button button-quiet" href="#gates">Trace the gates <span aria-hidden="true">↓</span></a>
+            </div>
+            <dl class="hero-facts" aria-label="ASTRA OS principles">
+              <div>
+                <dt>01—05</dt>
+                <dd>front-loaded gates</dd>
+              </div>
+              <div>
+                <dt>ON DISK</dt>
+                <dd>artifacts, not promises</dd>
+              </div>
+              <div>
+                <dt>HUMAN</dt>
+                <dd>approval stays in the loop</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="hero-console" aria-label="ASTRA OS run preview" data-hero-console>
+            <div class="console-chrome">
+              <div class="console-lights" aria-hidden="true"><span></span><span></span><span></span></div>
+              <span>ASTRA / REVIEW CONSOLE</span>
+              <span class="console-time">RUN 0001</span>
+            </div>
+            <div class="console-body">
+              <div class="console-runline"><span class="prompt">$</span> astra start <span class="command-string">"make billing observable"</span></div>
+              <div class="console-status"><span class="status-dot" aria-hidden="true"></span><span>GATE RAIL / HANDSHAKE READY</span></div>
+              <ol class="console-rail">
+                <li class="is-ready"><span>01</span><strong>PRODUCT INTENT</strong><small>UI LAYOUT / READY</small></li>
+                <li><span>02</span><strong>ARCHITECTURE</strong><small>SERVICE FIT / QUEUED</small></li>
+                <li><span>03</span><strong>PROGRAM DESIGN</strong><small>CONTRACTS / QUEUED</small></li>
+                <li><span>04</span><strong>GRAPH ENGINEERING</strong><small>DAG / QUEUED</small></li>
+                <li><span>05</span><strong>TESTING TROPHY</strong><small>EXECUTION / QUEUED</small></li>
+              </ol>
+              <div class="console-footer"><span>ARTIFACTS ARE THE WITNESS</span><span class="console-cursor" aria-hidden="true"></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-floor" aria-hidden="true"><span></span><span></span><span></span></div>
+      </section>
+
+      <section id="gates" class="section-shell section-gates" aria-labelledby="gates-title">
+        <div class="container">
+          <div class="section-heading reveal">
+            <p class="eyebrow">THE FRONT-LOADED LINE OF DEFENSE</p>
+            <div>
+              <h2 id="gates-title">Five gates. One coherent run.</h2>
+              <p>Each stage creates the thing the next stage is allowed to trust. If the artifact is missing or invalid, the transition stops.</p>
+            </div>
+          </div>
+
+          <ol class="gate-list" aria-label="ASTRA OS five gates">
+            <li class="gate-item gate-item--primary reveal">
+              <div class="gate-index">01</div>
+              <div class="gate-main">
+                <p class="eyebrow gate-label">PRODUCT ARCHITECT / GATE ONE</p>
+                <h3>Product intent <span>&amp;</span> visual spec</h3>
+                <p>Translate a human change request into the product intent and UI layout that everyone can validate before architecture exists.</p>
+                <div class="artifact-row"><span class="artifact-chip artifact-chip--hot">DOC</span><code>docs/01-product.md</code><span class="artifact-arrow" aria-hidden="true">→</span><code>json/ui-layout.json</code></div>
+              </div>
+              <div class="gate-signal" aria-hidden="true"><span>01</span><i></i><b>INTENT</b></div>
+            </li>
+            <li class="gate-item reveal">
+              <div class="gate-index">02</div>
+              <div class="gate-main">
+                <p class="eyebrow gate-label">SYSTEM DESIGNER + GRUNT / GATE TWO</p>
+                <h3>Architecture <span>&amp;</span> adversarial audit</h3>
+                <p>Design service fit, interfaces, data flow, and failure paths. Then put the design in front of a skeptic before anyone reads it as settled.</p>
+                <div class="artifact-row"><span class="artifact-chip">JSON</span><code>json/system-architecture.json</code><span class="artifact-arrow" aria-hidden="true">+</span><code>json/audit.json</code></div>
+              </div>
+              <div class="gate-signal gate-signal--blue" aria-hidden="true"><span>02</span><i></i><b>AUDIT</b></div>
+            </li>
+            <li class="gate-item reveal">
+              <div class="gate-index">03</div>
+              <div class="gate-main">
+                <p class="eyebrow gate-label">PROGRAM DESIGNER / GATE THREE</p>
+                <h3>Program design <span>&amp;</span> contract hardening</h3>
+                <p>Turn intent into exact paths, signatures, error contracts, and test assertions. The contract becomes the write boundary for execution.</p>
+                <div class="artifact-row"><span class="artifact-chip">JSON</span><code>json/call-stack-types.json</code><span class="artifact-arrow" aria-hidden="true">→</span><span class="artifact-note">write boundaries</span></div>
+              </div>
+              <div class="gate-signal gate-signal--lime" aria-hidden="true"><span>03</span><i></i><b>CONTRACT</b></div>
+            </li>
+            <li class="gate-item reveal">
+              <div class="gate-index">04</div>
+              <div class="gate-main">
+                <p class="eyebrow gate-label">GRAPH ENGINEER / GATE FOUR</p>
+                <h3>Graph engineering <span>&amp;</span> role allocation</h3>
+                <p>Decompose the work into a dependency-aware DAG. Every node carries a scoped role, write boundary, inputs, and outputs.</p>
+                <div class="artifact-row"><span class="artifact-chip">PLAN</span><code>PLAN.md</code><span class="artifact-arrow" aria-hidden="true">+</span><code>json/plan.json</code></div>
+              </div>
+              <div class="gate-signal gate-signal--amber" aria-hidden="true"><span>04</span><i></i><b>ALLOCATE</b></div>
+            </li>
+            <li class="gate-item gate-item--last reveal">
+              <div class="gate-index">05</div>
+              <div class="gate-main">
+                <p class="eyebrow gate-label">SLICE WORKERS / GATE FIVE</p>
+                <h3>Testing Trophy <span>execution</span></h3>
+                <p>Run static, unit, integration, and end-to-end evidence through the graph. State streams to the console on every transition.</p>
+                <div class="artifact-row"><span class="artifact-chip artifact-chip--hot">LIVE</span><code>json/dag-execution.json</code><span class="artifact-arrow" aria-hidden="true">+</span><code>00-status.md</code></div>
+              </div>
+              <div class="gate-signal gate-signal--hot" aria-hidden="true"><span>05</span><i></i><b>VERIFY</b></div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="session" class="section-shell section-session" aria-labelledby="session-title">
+        <div class="container">
+          <div class="section-heading reveal">
+            <p class="eyebrow">THE SESSION MODEL</p>
+            <div>
+              <h2 id="session-title">Reasoning stays in the room.</h2>
+              <p>ASTRA is the orchestration layer around the coding agent you already use. It keeps the handoff legible without asking your team to trust a black box.</p>
+            </div>
+          </div>
+
+          <div class="session-layout">
+            <figure class="session-map reveal" aria-labelledby="session-map-caption">
+              <figcaption id="session-map-caption" class="sr-only">ASTRA OS session architecture flow</figcaption>
+              <div class="map-node map-node--human"><span class="map-kicker">INPUT</span><strong>Human intent</strong><small>plain-language change</small></div>
+              <span class="map-connector map-connector--one" aria-hidden="true"><i></i></span>
+              <div class="map-node map-node--astra"><span class="map-kicker">CONTROL PLANE</span><strong>ASTRA OS</strong><small>gates / ledger / policy</small></div>
+              <span class="map-connector map-connector--two" aria-hidden="true"><i></i></span>
+              <div class="map-node map-node--agent"><span class="map-kicker">WORKER</span><strong>Agent CLI</strong><small>Pi · Claude · Codex · more</small></div>
+              <span class="map-connector map-connector--three" aria-hidden="true"><i></i></span>
+              <div class="map-node map-node--artifact"><span class="map-kicker">WITNESS</span><strong>Artifacts</strong><small>docs / json / status</small></div>
+              <div class="map-loop" aria-hidden="true"><span>review + approve</span></div>
+            </figure>
+
+            <div class="session-notes reveal">
+              <article class="note-block">
+                <span class="note-number">A</span>
+                <div><h3>One agent. The whole pipeline.</h3><p>The agent that wrote the product intent keeps its reasoning context through architecture, program design, graph planning, and execution.</p></div>
+              </article>
+              <article class="note-block">
+                <span class="note-number">B</span>
+                <div><h3>Every transition is inspectable.</h3><p>The ledger and artifacts are the source of truth. An announced-but-unrun gate cannot masquerade as complete.</p></div>
+              </article>
+              <article class="note-block">
+                <span class="note-number">C</span>
+                <div><h3>Human approval is a feature.</h3><p>ASTRA never enables unrestricted auto-run flags. Risky commands pause for an explicit response.</p></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="context" class="section-shell section-context" aria-labelledby="context-title">
+        <div class="container context-grid">
+          <div class="context-copy reveal">
+            <p class="eyebrow">SUBAGENTS / CONTEXT / BOUNDARIES</p>
+            <h2 id="context-title">Specialists can move fast because the frame is fixed.</h2>
+            <p>At the graph stage, each slice gets a role on top of a shared contract. The prompt stays small. The write boundary stays explicit. The output stays reviewable.</p>
+            <a class="text-link" href="#workflow">See the operator loop <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="context-stack reveal" aria-label="ASTRA OS context layers">
+            <div class="context-layer context-layer--top"><span>ROLE</span><strong>integration verifier</strong><small>≤ 80-word scoped prompt</small></div>
+            <div class="context-layer context-layer--mid"><span>BOUNDARY</span><strong>lib/runtime/local.mjs</strong><small>declared write surface</small></div>
+            <div class="context-layer context-layer--base"><span>CONTRACT</span><strong>call stack + assertions</strong><small>inputs / outputs / failure path</small></div>
+            <div class="context-pulse" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="budget" class="section-shell section-budget" aria-labelledby="budget-title">
+        <div class="container">
+          <div class="section-heading reveal">
+            <p class="eyebrow">BUDGET VISIBILITY / NO BROKER FEED</p>
+            <div>
+              <h2 id="budget-title">Make the pause visible.</h2>
+              <p>ASTRA does not manufacture a spend number or pretend to have live broker telemetry. It surfaces the decision point so an operator can make one.</p>
+            </div>
+          </div>
+          <div class="budget-panel reveal">
+            <div class="budget-console">
+              <div class="console-chrome"><div class="console-lights" aria-hidden="true"><span></span><span></span><span></span></div><span>POLICY / REQUEST QUEUE</span><span class="console-time">LOCAL</span></div>
+              <div class="budget-console-body">
+                <div class="budget-row budget-row--allow"><span class="budget-state">ALLOW</span><strong>read repository tree</strong><code>policy / safe</code></div>
+                <div class="budget-row budget-row--wait"><span class="budget-state">WAIT</span><strong>run external agent</strong><code>operator response</code></div>
+                <div class="budget-row budget-row--deny"><span class="budget-state">DENY</span><strong>write outside contract</strong><code>write boundary</code></div>
+                <div class="budget-prompt"><span class="prompt">$</span> astra respond <span class="command-string">&lt;request-id&gt;</span><span class="console-cursor" aria-hidden="true"></span></div>
+              </div>
+            </div>
+            <div class="budget-copy">
+              <p class="eyebrow">WHAT THE CONSOLE KNOWS</p>
+              <ul class="check-list">
+                <li><span aria-hidden="true">□</span> Which gate is open</li>
+                <li><span aria-hidden="true">□</span> Which artifact is missing or invalid</li>
+                <li><span aria-hidden="true">□</span> Which request needs a human response</li>
+                <li><span aria-hidden="true">□</span> Which write boundary a node owns</li>
+              </ul>
+              <p class="budget-note">No vendor lock-in to a broker dashboard. Keep the evidence you can inspect, version, and discuss.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="verification" class="section-shell section-verification" aria-labelledby="verification-title">
+        <div class="container">
+          <div class="section-heading reveal">
+            <p class="eyebrow">GATE FIVE / TESTING TROPHY</p>
+            <div>
+              <h2 id="verification-title">Evidence has a shape.</h2>
+              <p>Execution is not one green check. It is a trace across the layers that matter, rendered with the same rigor as the plan.</p>
+            </div>
+          </div>
+          <div class="trophy-grid" role="list" aria-label="Testing Trophy layers">
+            <article class="trophy-card trophy-card--static reveal" role="listitem"><div class="trophy-head"><span>01</span><span class="trophy-state">STATIC</span></div><h3>Shape check</h3><p>Lint, type, and AST checks catch a broken contract before runtime.</p><div class="trophy-bar"><i></i></div></article>
+            <article class="trophy-card trophy-card--unit reveal" role="listitem"><div class="trophy-head"><span>02</span><span class="trophy-state">UNIT</span></div><h3>Domain check</h3><p>Isolated calculations prove the smallest meaningful behavior.</p><div class="trophy-bar"><i></i></div></article>
+            <article class="trophy-card trophy-card--integration reveal" role="listitem"><div class="trophy-head"><span>03</span><span class="trophy-state">INTEGRATION</span></div><h3>Wiring check</h3><p>Real cross-component connections test the system where it joins.</p><div class="trophy-bar"><i></i></div></article>
+            <article class="trophy-card trophy-card--e2e reveal" role="listitem"><div class="trophy-head"><span>04</span><span class="trophy-state">E2E</span></div><h3>Trace check</h3><p>One path per slice confirms the user-visible behavior is still there.</p><div class="trophy-bar"><i></i></div></article>
+          </div>
+          <div class="verification-footnote reveal"><span class="status-dot" aria-hidden="true"></span><p><strong>The artifact is the witness.</strong> State streams to the retro visualizer on every node transition.</p><a class="text-link" href="https://github.com/justjammin/ASTRA_OS" target="_blank" rel="noreferrer">Inspect the source <span aria-hidden="true">↗</span></a></div>
+        </div>
+      </section>
+
+      <section id="workflow" class="section-shell section-workflow" aria-labelledby="workflow-title">
+        <div class="container workflow-grid">
+          <div class="workflow-copy reveal">
+            <p class="eyebrow">DEVELOPER WORKFLOW / CLI-FIRST</p>
+            <h2 id="workflow-title">A clean loop for the next change.</h2>
+            <p>Use the command line for the work. Use the review console for the shared picture. The surface is retro; the handoff is practical.</p>
+            <div class="workflow-links"><a class="button button-primary" href="https://www.npmjs.com/package/@ninjamin/astra-os" target="_blank" rel="noreferrer">Get the package <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/justjammin/ASTRA_OS" target="_blank" rel="noreferrer">Read the repo <span aria-hidden="true">↗</span></a></div>
+          </div>
+          <div class="terminal reveal" aria-label="ASTRA OS command line workflow">
+            <div class="console-chrome"><div class="console-lights" aria-hidden="true"><span></span><span></span><span></span></div><span>OPERATOR / ASTRA CLI</span><span class="console-time">NODE ≥ 18</span></div>
+            <div class="terminal-body">
+              <div class="terminal-line"><span class="prompt">$</span><code>astra doctor</code><span class="terminal-comment"># check available CLIs</span></div>
+              <div class="terminal-line"><span class="prompt">$</span><code>astra start <em>"add usage-based billing"</em></code></div>
+              <div class="terminal-line terminal-line--dim"><span class="prompt">→</span><code>gate 01 / product intent + UI mockups</code></div>
+              <div class="terminal-line"><span class="prompt">$</span><code>astra run</code><span class="terminal-comment"># generate current artifact</span></div>
+              <div class="terminal-line terminal-line--dim"><span class="prompt">→</span><code>human approval required</code></div>
+              <div class="terminal-line"><span class="prompt">$</span><code>astra approve product &amp;&amp; astra advance</code></div>
+              <div class="terminal-line"><span class="prompt">$</span><code>astra viz</code><span class="terminal-comment"># open review console</span></div>
+              <button class="copy-command" type="button" data-copy="astra start &quot;add usage-based billing&quot;">Copy starter command</button>
+              <span class="copy-status" role="status" aria-live="polite" data-copy-status></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="section-shell section-faq" aria-labelledby="faq-title">
+        <div class="container faq-grid">
+          <div class="faq-intro reveal"><p class="eyebrow">FREQUENT SIGNALS</p><h2 id="faq-title">Questions before the first run.</h2><p>The short version: ASTRA is a process and evidence layer for the agent you already have.</p></div>
+          <div class="faq-list reveal">
+            <details open><summary>Is ASTRA OS another coding agent?</summary><p>No. It is a portable harness around the coding agent you already use. ASTRA adds the gated process, artifact validation, bounded roles, and review surface.</p></details>
+            <details><summary>Which agent CLIs can ASTRA drive?</summary><p>The bundled adapters cover Pi, Claude, Droid, OpenCode, Hermes, and Codex. Pi runs through its SDK; the other adapters spawn their installed CLIs.</p></details>
+            <details><summary>What happens when a gate is not ready?</summary><p>ASTRA names the missing or invalid artifact, stops the transition, and leaves the run available for a bounded rework loop or a human decision.</p></details>
+            <details><summary>Can a non-technical stakeholder review the work?</summary><p>Yes. Gate 1 is written for product intent and visual validation, while the review console renders saved artifacts and document viewers for human inspection.</p></details>
+            <details><summary>Does ASTRA require LangGraph?</summary><p>No. The bundled local runtime is the default. LangGraph is an optional peer runtime with parity tests.</p></details>
+          </div>
+        </div>
+      </section>
+
+      <section id="install" class="section-shell section-cta" aria-labelledby="cta-title">
+        <div class="container cta-panel reveal">
+          <div class="cta-signal" aria-hidden="true"><span>ASTRA</span><i></i><span>READY</span></div>
+          <div><p class="eyebrow">NEXT RUN / YOUR CODEBASE</p><h2 id="cta-title">Give the change a paper trail.</h2><p>Start with intent, earn the implementation, keep the evidence.</p></div>
+          <div class="cta-actions"><a class="button button-primary" href="https://www.npmjs.com/package/@ninjamin/astra-os" target="_blank" rel="noreferrer">Install Astra <span aria-hidden="true">↗</span></a><a class="button button-quiet" href="https://github.com/justjammin/ASTRA_OS" target="_blank" rel="noreferrer">View on GitHub <span aria-hidden="true">↗</span></a></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <a class="brand footer-brand" href="#overview" aria-label="Back to ASTRA OS home"><span class="brand-mark" aria-hidden="true"><span class="brand-mark-letter">A</span><span class="brand-mark-letter brand-mark-letter--slash">/</span></span><span class="brand-name">ASTRA <span>OS</span></span></a>
+        <p>Spec-driven development for a world with coding agents.</p>
+        <nav class="footer-links" aria-label="Footer navigation"><a href="https://github.com/justjammin/ASTRA_OS" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a><a href="https://www.npmjs.com/package/@ninjamin/astra-os" target="_blank" rel="noreferrer">npm <span aria-hidden="true">↗</span></a><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noreferrer">Apache-2.0 <span aria-hidden="true">↗</span></a></nav>
+      </div>
+      <div class="container footer-bottom"><span>© <span data-year>2026</span> ASTRA OS</span><span>NO LIVE TELEMETRY / JUST THE ARTIFACTS</span><a href="#overview">BACK TO TOP ↑</a></div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js" defer></script>
+    <script src="./script.js" defer></script>
+  </body>
+</html>

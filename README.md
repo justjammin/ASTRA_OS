@@ -1,6 +1,6 @@
 ![/|STR/| OS](assets/astra-os.svg)
 
-**Spec Driven Development focused micro harness; driven end to end by one headless agent CLI.**
+**A portable, spec-driven session broker for the coding harness you already use.**
 
 | Dark — Horizon graphite / bone / lime | Light — same tokens, inverted |
 | --- | --- |
@@ -8,7 +8,7 @@
 
 ---
 
-Astra OS is a portable agent harness. It does not run its own model loop; it drives the coding CLI you already use (`claude`, `droid`, `opencode`, `hermes`, or `codex`) through five front-loaded spec driven development  gates, validating the artifacts each gate leaves on disk and stopping for human approval between every one.
+Astra OS is a portable agent harness. It drives Pi natively through its TypeScript SDK, or the coding CLI you already use (`claude`, `droid`, `opencode`, `hermes`, or `codex`), through five front-loaded spec-driven development gates. A durable session record connects the chosen harness to the GUI or host TUI, tracks coordinator and worker sessions, calculates token-budget progress, and preserves human approval between gates.
 
 The premise, started from a journey into harness orchestration, graph engineering, and Spec Driven Development: codebase rot comes from letting agents skip design. So design is front-loaded, gated, and machine-checked. An announced-but-unrun gate is impossible, because every gate block is rendered from artifacts on disk rather than typed by the agent.
 
@@ -21,13 +21,16 @@ npm i -g @ninjamin/astra-os     # or install the astra CLI globally (preferred)
 
 Also installable as a plugin: `.claude-plugin/`, `.codex-plugin/`, and `plugin.source.json` ship in the package, with `skills/`, `commands/`, and `agents/` wired up.
 
+Claude Code, Factory Droid, and Codex can also drive Astra through its MCP bridge. Install the package globally so `astra-mcp` is on `PATH`, then use the bundled `.claude-plugin/.mcp.json`, `.factory-plugin/mcp.json`, or `.codex/config.toml` example. The same operations are available everywhere: start, status, run, approve, respond, complete, and session. See `docs/harnesses/mcp.md`.
+
 ## Quickstart
 
 ```bash
 astra doctor                                    # which agent CLIs are on PATH
-astra start "add usage-based billing" --agent claude --judge magi
+astra start "add usage-based billing" --agent pi --judge magi --budget-tokens 200000
 astra run                                       # Gate 1: product intent + UI mockups
-astra viz                                       # retro review console at 127.0.0.1:4371
+astra session                                   # harness route, workers, token calculations
+astra viz                                       # open the retro review console
 astra approve product && astra advance          # human clears the gate
 astra run                                       # Gate 2 …
 ```
@@ -54,19 +57,21 @@ Everything lands under `.astra/<slug>/`. The ledger is `status.json`; its human 
 
 **Gate 5** runs the graph through the Testing Trophy: `static` (lint + type/AST), `unit` (isolated domain calculations), `integration` (DB, API, cross-component with real wiring — the heaviest layer), and `e2e` (one traced path per slice). A slice whose last node is `implement` is rejected at Gate 4 validation. State streams to the visualizer on every transition.
 
-## One agent, the whole pipeline
+## One coordinator, focused subagents
 
-The agent that wrote the product intent writes the code. Reasoning context stays coherent across gates instead of being handed between vendors.
+The selected harness owns one coordinator session across the pipeline. Astra uses a read-only scout before Gate 1, runs MAGI judges independently in parallel, and gives each Gate 5 DAG node a focused worker session. The coordinator retains the plan and compresses its context when usage reaches 50%; workers stay scoped to their task and write boundary. Astra never enables unrestricted auto-run flags; risky commands pause for an explicit response.
+
+Worker defaults favor capable, economical models: Claude requests `claude-sonnet-5` at medium effort; Codex and Droid request `gpt-5.6-luna` at max effort; OpenCode, Hermes, and Pi inherit their configured default. If a pinned model is unavailable, the adapter falls back to that harness's default and records a visible warning instead of hiding the downgrade.
 
 | Agent CLI | Headless invocation | Notes |
 |---|---|---|
-| `claude` | `claude -p "$PROMPT" --dangerously-skip-permissions` | Long-horizon reasoning gates |
-| `droid` | `droid exec --auto high "$PROMPT"` | High-speed vertical-slice generation |
+| `claude` | `claude -p "$PROMPT"` | Permission-aware long-horizon reasoning gates |
+| `droid` | `droid exec "$PROMPT"` | Permission-aware vertical-slice generation |
 | `opencode` | `opencode run --quiet "$PROMPT"` | Pragmatic audits, script generation |
 | `hermes` | `hermes chat --system "$ROLE" --message "$PROMPT"` | Native system-prompt slot |
-| `codex` | `codex exec --file prompt.txt` | Fast static verification, focused unit tests |
+| `codex` | prompt over stdin to `codex exec` | Durable thread metadata, focused workers |
 
-Pick with `--agent`. Adapters live in `lib/adapters.mjs`; adding one is a `build()` function.
+Pick with `--agent`. Pi uses the native SDK in-process; the other adapters use their installed CLIs and retain native session identifiers where supported. Adapters normalize token usage into the broker without maintaining a pricing database or enforcing spend. Adapters live in `lib/adapters.mjs`.
 
 ## Write boundaries are enforced, not requested
 
@@ -105,18 +110,46 @@ astra start "…" --runtime langgraph       # astra doctor shows which runtimes 
 
 ## Visualizer
 
-`astra viz` serves a 1980s-retro review console (Chakra Petch, CRT scanlines, neon) that reads the run root and streams updates over SSE: Gate 1 mockups, Gate 2 sequence diagrams next to audit risk flags, Gate 3 call graph and type boundaries, Gate 4 DAG in topological waves, Gate 5 live node state. Approve or request changes per gate from the footer. Open questions render read-only — answer them in your agent session.
+`astra start` opens the GUI automatically from an interactive terminal; `--no-gui` keeps the host CLI as the TUI, and `--gui` forces the console. `astra viz` serves a 1980s-retro review console (Chakra Petch, CRT scanlines, neon) that reads the run root and streams session, budget, worker, and gate updates over SSE. Approve or request changes per gate from the footer. Risky commands and agent input waits render as live interaction cards with allow, deny, or answer controls.
 
 Every Markdown file in the run root is rendered as HTML (headings, tables, code, lists) and each one pops out into a full-width modal, so a 36 KB program design is readable without leaving the console. A `TRANSCRIPT` panel tails the last 50 lines of whichever agent-CLI log is currently being written — that output never reaches your TUI, since the harness drives the CLI headlessly.
 
 ![Document viewers popping out into full-width modals](assets/screens/doc-viewers.gif)
 
+## Recruiter showcase
+
+`site/` is a standalone ASTRA-styled product page with an authored five-gate story, accessible finite GSAP motion, structured product/how-to/FAQ data, and no dependency on a live run. Launch or deploy it alongside Astra:
+
+```bash
+npm run site:dev       # Cloudflare local preview
+npm run site:deploy    # deploy static assets to workers.dev
+```
+
+GitHub Actions deploys the site from `main` when `site/` or its Wrangler config changes. Add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as secrets on the `cloudflare` GitHub environment; the workflow verifies the full test suite before deploying with Wrangler.
+
+## Releases
+
+The package is currently version `0.2.0`. A semantic version tag packages the tested npm artifact and attaches that same tarball to a GitHub release. Publish npm locally when you are ready:
+
+```bash
+npm test
+npm publish --access public
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+The GitHub workflow does not publish npm. It only verifies, packages, and creates the GitHub release; it refuses tags that do not match `package.json`.
+
 ## Commands and exit codes
 
 ```
 astra                                install skills, plugin files, and the role map
-astra start "<intent>"               [--agent …] [--judge solo|magi] [--runtime local|langgraph] [--out <dir>]
+astra start "<intent>"               [--agent …] [--judge solo|magi] [--runtime local|langgraph]
+                                     [--budget-tokens N] [--gui|--no-gui] [--out <dir>]
 astra run [--all] [--dry-run]        drive the current gate
+astra session [--json]               harness route, workers, and token calculations
+astra mcp                            MCP stdio server for host harnesses
+astra respond <request-id>           resolve a pending command/input wait
 astra gate [<gate>]                  validate a gate from disk
 astra approve <gate>                 human-only
 astra advance                        next gate
@@ -139,7 +172,7 @@ npm test          # node --test, zero dependencies
 node visualizer/server.mjs .astra/<slug>
 ```
 
-Zero required runtime dependencies (LangGraph.js is an optional peer), Node >= 18, ESM throughout. Schemas in `lib/schemas/` are the artifact contract; the validator in `lib/validate.mjs` implements the subset they use.
+Node >= 18, ESM throughout. Pi and runtime-schema support ship as dependencies; LangGraph.js remains an optional peer. Schemas in `lib/schemas/` are the artifact contract; the validator in `lib/validate.mjs` implements the subset they use.
 
 ## License
 

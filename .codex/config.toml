@@ -1,0 +1,7 @@
+# Project-local Codex configuration for the Astra MCP bridge.
+# Keep approval policy explicit: Astra itself still requires human:true for gate clearing.
+
+[mcp_servers.astra]
+command = "astra-mcp"
+args = []
+startup_timeout_sec = 30

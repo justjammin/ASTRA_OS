@@ -964,6 +964,80 @@ async function submitFeedback(gate, verdict, textarea, feedbackState, buttons) {
   }
 }
 
+async function submitInteraction(interaction, action, value, state) {
+  state.textContent = "TRANSMITTING…";
+  try {
+    const response = await fetch("/api/interaction/respond", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ requestId: interaction.requestId, resumeToken: interaction.resumeToken, action, ...(value ? { value } : {}) }),
+    });
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) throw new Error(payload.error?.message || `server returned ${response.status}`);
+    state.textContent = "RESPONSE SAVED";
+  } catch (error) {
+    state.textContent = `ERROR // ${error.message}`;
+  }
+}
+
+function renderInteraction(data) {
+  const interaction = data?.interaction;
+  if (!interaction || interaction.status !== "waiting") return null;
+  const responseState = node("div", "feedback-state", { "aria-live": "polite" });
+  const controls = [];
+  if (interaction.kind === "command-approval") {
+    controls.push(node("button", "review-button approve", { type: "button", text: "ALLOW ONCE" }));
+    controls.push(node("button", "review-button changes", { type: "button", text: "DENY" }));
+    controls[0].addEventListener("click", () => submitInteraction(interaction, "approve", "", responseState));
+    controls[1].addEventListener("click", () => submitInteraction(interaction, "deny", "", responseState));
+  } else {
+    const answer = node("input", "interaction-answer", { type: "text", placeholder: "TYPE RESPONSE" });
+    const send = node("button", "review-button approve", { type: "button", text: "ANSWER" });
+    send.addEventListener("click", () => submitInteraction(interaction, "answer", answer.value, responseState));
+    controls.push(answer, send);
+  }
+  return section("interaction", "LIVE CONTROL", "Pending agent interaction", node("div", "interaction-card", {}, [
+    node("div", "eyebrow", { text: `${interaction.kind} // ${interaction.agent} // ${interaction.risk}` }),
+    node("h3", "", { text: interaction.summary }),
+    interaction.command ? node("pre", "mock-terminal", { text: `${interaction.cwd || ""}\n$ ${interaction.command}` }) : null,
+    interaction.question ? node("p", "session-note", { text: interaction.question }) : null,
+    node("div", "button-row", {}, controls),
+    responseState,
+  ]));
+}
+
+function formatTokens(value) {
+  return Number(value ?? 0).toLocaleString();
+}
+
+function renderSession(data) {
+  const session = data?.session;
+  if (!session) return null;
+  const budget = session.budget ?? {};
+  const limit = budget.budgetTokens ? formatTokens(budget.budgetTokens) : "UNBOUNDED";
+  const percent = budget.percent == null ? "—" : `${Number(budget.percent).toFixed(1)}%`;
+  const workers = session.workers ?? [];
+  const cards = node("div", "session-grid", {}, [
+    node("article", "session-stat", {}, [node("span", "eyebrow", { text: "SESSION PATH" }), node("strong", "", { text: `SESSION → ${String(session.harness).toUpperCase()} → ${String(session.interface).toUpperCase()}` })]),
+    node("article", "session-stat", {}, [node("span", "eyebrow", { text: "TOKEN BUDGET" }), node("strong", "", { text: `${formatTokens(budget.usedTokens)} / ${limit}` }), node("small", "", { text: `${percent} used · compact at 50%` })]),
+    node("article", "session-stat", {}, [node("span", "eyebrow", { text: "SUBAGENTS" }), node("strong", "", { text: `${workers.filter((worker) => worker.status === "running").length} ACTIVE / ${workers.length} TOTAL` })]),
+  ]);
+  if (budget.percent != null) {
+    const meter = node("progress", "session-budget", { max: "100", value: Math.min(100, Number(budget.percent)), "aria-label": "Token budget used" });
+    cards.children[1].append(meter);
+  }
+  if (workers.length) {
+    cards.append(dataTable(["WORKER", "HARNESS", "MODEL", "STATUS"], workers.map((worker) => [
+      worker.kind ?? worker.id,
+      worker.harness ?? session.harness,
+      worker.model ?? "inherited",
+      chip(worker.status ?? "pending"),
+    ]), "worker-table"));
+  }
+  for (const warning of session.warnings ?? []) cards.append(node("p", "session-note", { text: `WARNING // ${warning}` }));
+  return section("session", "DURABLE BROKER", "Session, harness & budget", cards);
+}
+
 function renderReviewFooter(data) {
   const content = node("div", "panel");
   content.append(node("div", "panel-heading", {}, [
@@ -998,8 +1072,12 @@ function renderState(data) {
   app.state = data;
   updateHeader(data);
   consoleRoot.replaceChildren();
+  const session = renderSession(data);
+  if (session) consoleRoot.append(session);
   consoleRoot.append(renderGateRail(data));
   const renderers = [renderUiLayout, renderArchitecture, renderAudit, renderContracts, renderPlan, renderExecution, renderLogFeed];
+  const interaction = renderInteraction(data);
+  if (interaction) consoleRoot.append(interaction);
   for (const renderer of renderers) {
     const rendered = renderer(data);
     if (rendered) consoleRoot.append(rendered);

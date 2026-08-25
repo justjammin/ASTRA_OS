@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">ASTRA OS — Make the agent earn its way to code</title>
+  <desc id="desc">A retro review-console inspired social card for ASTRA OS.</desc>
+  <defs>
+    <linearGradient id="wash" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#181812"/>
+      <stop offset="1" stop-color="#0c0c05"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#49abfd" stroke-opacity=".11"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#wash)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <path d="M0 105h1200M0 526h1200" stroke="#807d4f" stroke-opacity=".42"/>
+  <path d="M58 526 212 105h22L80 526z" fill="#f84527" opacity=".75"/>
+  <path d="M1040 105h68v421h-68z" fill="#49abfd" opacity=".1"/>
+  <g fill="#f4f0dd" font-family="Chakra Petch, Arial, sans-serif">
+    <text x="80" y="146" fill="#9fd22c" font-size="22" letter-spacing="6">SPEC-DRIVEN DEVELOPMENT / 001</text>
+    <text x="80" y="298" font-size="83" font-weight="700" letter-spacing="-3">MAKE THE AGENT</text>
+    <text x="80" y="388" fill="#9fd22c" font-size="83" font-weight="700" letter-spacing="-3">EARN ITS WAY TO CODE.</text>
+  </g>
+  <g fill="#bebaa5" font-family="ui-monospace, Menlo, monospace" font-size="18" letter-spacing="2">
+    <text x="84" y="474">FIVE FRONT-LOADED GATES  /  ARTIFACTS ARE THE WITNESS</text>
+    <text x="84" y="560" fill="#49abfd">ASTRA OS</text>
+    <text x="1010" y="560">RUN 0001</text>
+  </g>
+  <circle cx="1110" cy="146" r="6" fill="#9fd22c"/>
+</svg>

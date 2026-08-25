@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">ASTRA OS</title>
+  <desc id="desc">A lime and vermilion ASTRA OS monogram on a graphite square.</desc>
+  <rect width="64" height="64" rx="9" fill="#0c0c05"/>
+  <rect x="2" y="2" width="60" height="60" rx="8" fill="none" stroke="#807d4f" stroke-width="1.5"/>
+  <path d="M17 48 29 16h8L25 48h-8Zm18-32h8v32h-8z" fill="#9fd22c"/>
+  <path d="M18 43h29" stroke="#f84527" stroke-width="2"/>
+  <path d="M19 39h27" stroke="#49abfd" stroke-width="1" opacity=".82"/>
+</svg>

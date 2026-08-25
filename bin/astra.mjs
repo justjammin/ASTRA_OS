@@ -2,7 +2,7 @@
 // astra — the Astra OS harness CLI.
 //
 //   astra                                     install skills + plugin files, scan roles
-//   astra start "<intent>" [--agent claude]    open a run and its ledger
+//   astra start "<intent>" [--agent claude|pi]  open a run and its ledger
 //   astra run [--gate <id>] [--all]            drive the current gate with the chosen agent CLI
 //   astra gate <id>                            validate a gate from artifacts on disk
 //   astra approve <id>                         human-only: clear a gate
@@ -11,6 +11,7 @@
 //   astra roles scan|list|show <name>          role map (vendored + external roots)
 //   astra doctor                               which agent CLIs are installed
 import { cp, mkdir, readdir } from "node:fs/promises";
+import { spawn } from "node:child_process";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,6 +33,8 @@ import { runDesignGate, runExecution } from "../lib/pipeline.mjs";
 import { MAP_DIR, loadMap, hydrate, scan } from "../lib/rolemap.mjs";
 import { RUNTIME_IDS, getRuntime } from "../lib/runtime/index.mjs";
 import { banner, ensureDir, slugify, style } from "../lib/util.mjs";
+import { readInteraction, respondInteraction } from "../lib/policy.mjs";
+import { initializeSession, loadSession, mutateSession, WORKER_MODELS } from "../lib/broker.mjs";
 
 const PKG_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SKILLS = ["astra", "grunt"];
@@ -141,6 +144,8 @@ function contextFor({ cwd, root, ledger }, flags) {
     dryRun: Boolean(flags["dry-run"]),
     specialists: flags.specialists === "false" ? false : true,
     timeoutMs: flags.timeout ? Number(flags.timeout) * 1000 : undefined,
+    budgetTokens: flags["budget-tokens"] ?? ledger.meta.budgetTokens ?? null,
+    workerModel: WORKER_MODELS[flags.agent ?? ledger.meta.agent] ?? { model: null, effort: null },
   };
 }
 
@@ -160,6 +165,10 @@ async function cmdStart(positional, flags) {
   if (!["solo", "magi"].includes(judge)) throw exit(`--judge must be solo or magi, got "${judge}"`, 1);
   const runtime = flags.runtime ?? "local";
   if (!RUNTIME_IDS.includes(runtime)) throw exit(`--runtime must be one of: ${RUNTIME_IDS.join(", ")}`, 1);
+  if (flags["budget-tokens"] !== undefined) {
+    const budget = Number(flags["budget-tokens"]);
+    if (!Number.isSafeInteger(budget) || budget <= 0) throw exit("--budget-tokens must be a positive integer", 1);
+  }
 
   const cwd = process.cwd();
   const slug = flags.slug ? slugify(flags.slug) : slugify(intent);
@@ -178,7 +187,16 @@ async function cmdStart(positional, flags) {
   await ensureDir(root);
   const ledger = emptyLedger({ slug, intent, agent, judge, runRoot: root, cwd });
   ledger.meta.runtime = runtime;
+  ledger.meta.budgetTokens = flags["budget-tokens"] ? Number(flags["budget-tokens"]) : null;
   await saveLedger(root, ledger);
+
+  const gui = flags.gui || (!flags["no-gui"] && process.stdout.isTTY);
+  await initializeSession(root, {
+    slug,
+    harness: agent,
+    budgetTokens: ledger.meta.budgetTokens,
+    interfaceMode: gui ? "gui" : "tui",
+  });
 
   const detection = (await detectAll()).find((d) => d.id === agent);
   console.log(
@@ -188,16 +206,35 @@ async function cmdStart(positional, flags) {
       `agent     ${agent}${detection?.installed ? "" : "  (NOT ON PATH)"}`,
       `judge     ${judge}`,
       `runtime   ${runtime}`,
+      `session   ${agent} → ${gui ? "GUI" : "TUI"}`,
+      `budget    ${ledger.meta.budgetTokens ? `${ledger.meta.budgetTokens.toLocaleString()} tokens` : "display only (unbounded)"}`,
       `artifacts ${root}`,
       `phase     1/5 ${GATES[0].name}`,
     ]),
   );
-  console.log(`\n  next: ${style.lime("astra run")}\n`);
+  if (gui) {
+    launchVisualizer(root, Number(flags.port ?? 4319));
+    console.log(`\n  console launching in background; next: ${style.lime("astra run")}\n`);
+  } else {
+    console.log(`\n  next: ${style.lime("astra run")}  ·  GUI: ${style.lime("astra viz")}\n`);
+  }
+}
+
+function launchVisualizer(root, port) {
+  const child = spawn(process.execPath, [join(PKG_ROOT, "visualizer", "server.mjs"), root, `--port=${port}`, "--open"], {
+    detached: true,
+    stdio: "ignore",
+  });
+  child.unref();
 }
 
 async function cmdRun(positional, flags) {
   const run = await resolveRun(flags);
   const ctx = contextFor(run, flags);
+  await mutateSession(run.root, (session) => {
+    session.status = "running";
+    session.coordinator.status = "running";
+  });
   const all = Boolean(flags.all);
   const target = flags.gate ?? positional[0] ?? run.ledger.phase;
 
@@ -325,6 +362,10 @@ async function cmdComplete(_positional, flags) {
   const run = await resolveRun(flags);
   run.ledger.complete = true;
   await saveLedger(run.root, run.ledger);
+  await mutateSession(run.root, (session) => {
+    session.status = "complete";
+    session.coordinator.status = "complete";
+  });
   console.log(`  run "${run.ledger.meta.slug}" closed.`);
 }
 
@@ -335,6 +376,48 @@ async function cmdStatus(_positional, flags) {
     return;
   }
   console.log(renderStatus(run.ledger));
+  const session = await loadSession(run.root);
+  if (session) printSession(session);
+}
+
+async function cmdSession(_positional, flags) {
+  const run = await resolveRun(flags);
+  const session = await loadSession(run.root);
+  if (!session) throw exit("run has no broker session", 3);
+  if (flags.json) console.log(JSON.stringify(session, null, 2));
+  else printSession(session);
+}
+
+function printSession(session) {
+  const budget = session.budget ?? {};
+  const used = Number(budget.usedTokens ?? 0).toLocaleString();
+  const limit = budget.budgetTokens ? Number(budget.budgetTokens).toLocaleString() : "unbounded";
+  const percent = budget.percent == null ? "—" : `${budget.percent.toFixed(1)}%`;
+  console.log(`\n${banner("ASTRA SESSION", [
+    `id       ${session.id}`,
+    `path     session → ${session.harness} → ${String(session.interface).toUpperCase()}`,
+    `budget   ${used} / ${limit} tokens (${percent})`,
+    `workers  ${(session.workers ?? []).length}`,
+  ])}`);
+  for (const warning of session.warnings ?? []) console.log(`  ${style.amber("!")} ${warning}`);
+}
+
+async function cmdRespond(positional, flags) {
+  const requestId = positional[0];
+  if (!requestId) throw exit('astra respond <request-id> --approve|--deny|--answer="…"', 1);
+  const run = await resolveRun(flags);
+  const action = flags.approve ? "approve" : flags.deny ? "deny" : flags.answer !== undefined ? "answer" : null;
+  if (!action) throw exit('choose exactly one of --approve, --deny, or --answer="…"', 1);
+  const current = await readInteraction(run.root);
+  if (!current || current.requestId !== requestId) throw exit(`no pending interaction "${requestId}"`, 1);
+  const result = await respondInteraction(run.root, {
+    requestId,
+    resumeToken: flags.token ?? current.resumeToken,
+    action,
+    ...(action === "answer" ? { value: String(flags.answer) } : {}),
+  });
+  if (!result.ok) throw exit(result.errors.join("; "), 1);
+  console.log(`  ${style.lime("interaction resolved")} ${requestId} — ${result.data.status}`);
 }
 
 async function cmdViz(_positional, flags) {
@@ -343,6 +426,7 @@ async function cmdViz(_positional, flags) {
   const { url } = await startVisualizer({
     runRoot: run.root,
     port: Number(flags.port ?? 4319),
+    open: flags.open !== "false" && !flags["no-open"],
   });
   console.log(banner("ASTRA VISUALIZER", [`run   ${run.ledger.meta.slug}`, `url   ${url}`, "stop  ctrl-c"]));
 }
@@ -396,6 +480,11 @@ async function cmdDoctor() {
   }
 }
 
+async function cmdMcp() {
+  const { serveStdio } = await import("../lib/mcp-server.mjs");
+  await serveStdio();
+}
+
 async function runtimeReady(id) {
   if (id !== "langgraph") return { ok: true };
   try {
@@ -412,8 +501,9 @@ function usage() {
       "astra — Astra OS harness",
       "",
       "  astra                                install skills, plugin files, and the role map",
-      '  astra start "<intent>"               open a run   [--agent claude|droid|opencode|hermes|codex]',
-      "                                                    [--judge solo|magi] [--runtime local|langgraph] [--out <dir>]",
+      '  astra start "<intent>"               open a run   [--agent claude|droid|opencode|hermes|codex|pi]',
+      "                                                    [--judge solo|magi] [--runtime local|langgraph] [--budget-tokens N]",
+      "                                                    [--gui|--no-gui] [--out <dir>]",
       "  astra run [--all] [--dry-run]        drive the current gate with the run's agent CLI",
       "                                       gate 5 only: [--slice tracer|<id>] [--concurrency N] [--timeout <sec>]",
       "  astra gate [<gate>]                  validate a gate from artifacts on disk",
@@ -421,9 +511,12 @@ function usage() {
       "  astra advance                        move to the next gate",
       '  astra loop --to=<gate> --reason="…"  go back a gate (budget 2 each)',
       "  astra status [--json]                ledger",
+      "  astra session [--json]               harness, workers, and token budget",
+      "  astra respond <request-id>            resolve a pending command/input wait",
       "  astra viz [--port 4319]              retro review console",
       "  astra roles scan|list|show <name>    role map",
       "  astra doctor                         installed agent CLIs and runtimes",
+      "  astra mcp                            MCP stdio server for host harnesses",
       "  astra complete                       close the run",
       "",
       `  gates: ${GATES.map((g) => `${g.n}:${g.id}`).join("  ")}`,
@@ -442,9 +535,12 @@ const COMMANDS = {
   advance: cmdAdvance,
   loop: cmdLoop,
   status: cmdStatus,
+  session: cmdSession,
+  respond: cmdRespond,
   viz: cmdViz,
   roles: cmdRoles,
   doctor: cmdDoctor,
+  mcp: cmdMcp,
   complete: cmdComplete,
   install,
 };

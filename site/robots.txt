@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# The canonical and social URLs are origin-relative in index.html so the same
+# static bundle can run at any Cloudflare workers.dev hostname.

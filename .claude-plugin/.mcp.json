@@ -1,0 +1,7 @@
+{
+  "astra": {
+    "type": "stdio",
+    "command": "astra-mcp",
+    "args": []
+  }
+}
