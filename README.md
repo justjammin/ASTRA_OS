@@ -172,7 +172,7 @@ npm test          # node --test, zero dependencies
 node visualizer/server.mjs .astra/<slug>
 ```
 
-Node >= 18, ESM throughout. Pi and runtime-schema support ship as dependencies; LangGraph.js remains an optional peer. Schemas in `lib/schemas/` are the artifact contract; the validator in `lib/validate.mjs` implements the subset they use.
+Node >= 22.19, ESM throughout. Pi and runtime-schema support ship as dependencies; LangGraph.js remains an optional peer. Schemas in `lib/schemas/` are the artifact contract; the validator in `lib/validate.mjs` implements the subset they use.
 
 ## License
 
