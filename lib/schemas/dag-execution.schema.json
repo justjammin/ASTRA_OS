@@ -20,7 +20,8 @@
         "finishedAt": { "type": "string" },
         "concurrency": { "type": "integer" },
         "runtime": { "type": "string" },
-        "sliceFilter": { "type": "string" }
+        "sliceFilter": { "type": "string" },
+        "policy": { "$ref": "#/definitions/policyEvidence" }
       }
     },
     "status": { "enum": ["idle", "running", "passed", "failed", "blocked"] },
@@ -44,7 +45,8 @@
           "durationMs": { "type": "integer" },
           "exitCode": { "type": "integer" },
           "summary": { "type": "string" },
-          "logPath": { "type": "string" }
+          "logPath": { "type": "string" },
+          "policy": { "$ref": "#/definitions/policyEvidence" }
         }
       }
     },
@@ -74,6 +76,20 @@
           "node": { "type": "string" },
           "message": { "type": "string" }
         }
+      }
+    }
+  },
+  "definitions": {
+    "policyEvidence": {
+      "type": "object",
+      "required": ["profile", "version", "backend", "probe", "violations"],
+      "additionalProperties": false,
+      "properties": {
+        "profile": { "type": "string" },
+        "version": { "type": "integer" },
+        "backend": { "type": "string" },
+        "probe": { "type": "object" },
+        "violations": { "type": "array", "items": { "type": "string" } }
       }
     }
   }

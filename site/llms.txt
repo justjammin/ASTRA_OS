@@ -8,7 +8,7 @@ ASTRA drives a coding agent through five front-loaded software-factory gates. Ea
 
 ## The five gates
 
-1. Product Intent & Visual Spec
+1. Product Intent & User Story (Mermaid flow; OpenPencil UI artifact when a graphical component is present)
 2. Architecture & Adversarial Audit
 3. Program Design & Contract Hardening
 4. Graph Engineering & Agent Role Allocation
@@ -21,6 +21,8 @@ The bundled local runtime is the default. LangGraph is an optional peer runtime.
 ## Review surface
 
 `astra viz` opens the retro review console. It renders saved Markdown and JSON artifacts, gate state, graph execution, and human response requests. ASTRA does not provide live broker telemetry in this static site; budget and policy decisions remain explicit operator decisions.
+
+Gate 1 User Stories always include a Mermaid.js interaction flow. UI stories additionally produce a read-only `.fig` design and PNG preview for the review console's pop-out viewer.
 
 ## Links
 

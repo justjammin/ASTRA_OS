@@ -20,3 +20,13 @@ test("release workflow is tag-gated and publishes the packed artifact", async ()
   assert.match(workflow, /gh release create[\s\S]*\$PACKAGE_TGZ/);
   assert.match(workflow, /RELEASE_TAG[\s\S]*package\.json/);
 });
+
+test("npm workflow is tag-gated and publishes with trusted provenance", async () => {
+  const workflow = await readFile(join(ROOT, ".github", "workflows", "npm-publish.yml"), "utf8");
+  assert.match(workflow, /v\*\.\*\.\*/);
+  assert.match(workflow, /id-token:\s*write/);
+  assert.match(workflow, /environment:\s*\n\s*name:\s*npm-release/);
+  assert.match(workflow, /RELEASE_TAG[\s\S]*package\.json/);
+  assert.match(workflow, /npm publish --access public --provenance/);
+  assert.doesNotMatch(workflow, /NPM_TOKEN|NODE_AUTH_TOKEN/);
+});

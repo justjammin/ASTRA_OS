@@ -26,9 +26,9 @@ const content = {
   "03-program-design.md": "## File map\\n\\n" + "Contract detail with signatures. ".repeat(40),
   "04-slices.md": "## Slices\\n\\n" + "Slice detail with demos. ".repeat(30),
   "PLAN.md": "## Nodes\\n\\n" + "Node table and wave order. ".repeat(20),
-  "ui-layout.json": JSON.stringify({
-    meta: { slug, intent: "stub intent" },
-    screens: [{ id: "u1", name: "List", purpose: "see widgets", elements: [{ type: "table", label: "Widgets" }], acceptance: ["lists widgets"] }],
+  "user-story.json": JSON.stringify({
+    meta: { slug, intent: "stub intent", surface: "non-ui" },
+    mermaid: "flowchart TD\\n  start[Run widget command] --> done[Widget is created]",
   }),
   "system-architecture.json": JSON.stringify({
     meta: { slug, intent: "stub intent" },
@@ -46,9 +46,9 @@ const content = {
     meta: { slug, intent: "stub intent", agent: "claude" },
     slices: [{ id: "s1", title: "Tracer", demo: "create a widget", tracer: true, criteria: ["widget created"], nodes: ["n1", "n2"] }],
     nodes: [
-      { id: "n1", title: "implement create", slice: "s1", kind: "implement", deps: [], command: "true",
+      { id: "n1", title: "implement create", slice: "s1", kind: "implement", deps: [], command: { program: "true", args: [] },
         role: { name: "impl", systemPrompt: "own src/widget.ts", writeBoundary: ["src/widget.ts"] } },
-      { id: "n2", title: "integration check", slice: "s1", kind: "integration", deps: ["n1"], command: "true",
+      { id: "n2", title: "integration check", slice: "s1", kind: "integration", deps: ["n1"], command: { program: "true", args: [] },
         role: { name: "int", systemPrompt: "verify wiring", writeBoundary: ["test/widget.test.ts"] } },
     ],
   }),

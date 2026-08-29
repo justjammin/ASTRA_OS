@@ -10,8 +10,9 @@
 //   astra viz [--port 4319]                    serve the retro review console
 //   astra roles scan|list|show <name>          role map (vendored + external roots)
 //   astra doctor                               which agent CLIs are installed
-import { cp, mkdir, readdir } from "node:fs/promises";
-import { spawn } from "node:child_process";
+import { cp, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { execFile, spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -37,13 +38,22 @@ import { readInteraction, respondInteraction } from "../lib/policy.mjs";
 import { initializeSession, loadSession, mutateSession, WORKER_MODELS } from "../lib/broker.mjs";
 
 const PKG_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const SKILLS = ["astra", "grunt"];
+const SKILLS = ["stella", "grunt", "mermaid", "open-pencil"];
 const COMMAND_FILES = ["astra.md", "grunt.md"];
+const MCP_NAME = "astra";
+const MCP_SERVER = join(PKG_ROOT, "lib", "mcp-server.mjs");
+const MCP_CONFIG = Object.freeze({ type: "stdio", command: process.execPath, args: [MCP_SERVER] });
+const LEGACY_SKILL_HASHES = new Set([
+  "c6663fb08466cc8c988384db537837cb62f1028980211b928cb3e57ef800adf2",
+  "352737b09c3239f7145d6d45ce2a49594ca04f8c4ba0dceea2a180ea4af8ec32",
+  "d363b8f4dacf7e954cb18c6bf8790607aebacfc39f32b0debd8865ee89c9a553",
+  "af45835342a21cc7c67fd2f1ddbf7c51d741d8db7a9ff0998a3d0df4081b9fc8",
+]);
 // Claude Code reads slash commands from ~/.claude/commands; Codex reads them from ~/.codex/prompts.
 const HOSTS = [
-  { id: "claude", skills: [".claude", "skills"], commands: [".claude", "commands"] },
-  { id: "codex", skills: [".codex", "skills"], commands: [".codex", "prompts"] },
-  { id: "droid", skills: [".factory", "skills"], commands: [".factory", "commands"] },
+  { id: "claude", cli: "claude", skills: [".claude", "skills"], commands: [".claude", "commands"] },
+  { id: "codex", cli: "codex", skills: [".codex", "skills"], commands: [".codex", "prompts"] },
+  { id: "droid", cli: "droid", skills: [".factory", "skills"], commands: [".factory", "commands"] },
 ];
 
 function parseArgs(argv) {
@@ -63,24 +73,155 @@ function parseArgs(argv) {
   return { flags, positional };
 }
 
+function runFile(file, args) {
+  return new Promise((resolve) => execFile(file, args, { encoding: "utf8" }, (error, stdout, stderr) => resolve({ error, stdout, stderr })));
+}
+
+async function commandAvailable(command) {
+  const result = await runFile("which", [command]);
+  return !result.error;
+}
+
+async function removeLegacySkill(dir) {
+  try {
+    const entries = await readdir(dir, { withFileTypes: true });
+    if (entries.length !== 1 || !entries[0].isFile() || entries[0].name !== "SKILL.md") return false;
+    const hash = createHash("sha256").update(await readFile(join(dir, "SKILL.md"))).digest("hex");
+    if (!LEGACY_SKILL_HASHES.has(hash)) return false;
+    await rm(dir, { recursive: true });
+    console.log(`  removed legacy skill  ${dir}`);
+    return true;
+  } catch (error) {
+    if (error.code !== "ENOENT") console.warn(`  warning: could not inspect legacy skill ${dir}: ${error.message}`);
+    return false;
+  }
+}
+
+async function installHost(host) {
+  if (!(await commandAvailable(host.cli))) {
+    console.log(`  skipped ${host.id} (CLI not found)`);
+    return;
+  }
+  const skillDir = join(homedir(), ...host.skills);
+  const commandDir = join(homedir(), ...host.commands);
+  await mkdir(skillDir, { recursive: true });
+  await mkdir(commandDir, { recursive: true });
+  for (const name of SKILLS) {
+    await cp(join(PKG_ROOT, "skills", name), join(skillDir, name), { recursive: true, force: true });
+  }
+  for (const file of COMMAND_FILES) {
+    await cp(join(PKG_ROOT, "commands", file), join(commandDir, file), { force: true });
+  }
+  await removeLegacySkill(join(skillDir, "astra"));
+  await removeLegacySkill(join(skillDir, "astra-mcp"));
+  console.log(`  installed  ${SKILLS.join(", ")}  →  ${skillDir}`);
+  console.log(`             ${COMMAND_FILES.map((f) => `/${f.replace(".md", "")}`).join(", ")}  →  ${commandDir}`);
+  if (host.id !== "droid") await registerMcp(host);
+}
+
+async function existingMcp(host) {
+  const path = host.id === "claude" ? join(homedir(), ".claude.json") : join(homedir(), ".codex", "config.toml");
+  try {
+    const raw = await readFile(path, "utf8");
+    if (host.id === "claude") {
+      const config = JSON.parse(raw);
+      const found = [];
+      const visit = (value) => {
+        if (!value || typeof value !== "object") return;
+        if (value.mcpServers?.[MCP_NAME]) found.push(value.mcpServers[MCP_NAME]);
+        for (const child of Object.values(value)) visit(child);
+      };
+      visit(config);
+      return found[0] ? { exists: true, same: JSON.stringify(found[0]) === JSON.stringify(MCP_CONFIG) } : { exists: false };
+    }
+    const section = raw.match(/(?:^|\n)\[mcp_servers\.astra\]([\s\S]*?)(?=\n\[|$)/)?.[1];
+    return section ? { exists: true, same: section.includes(`command = ${JSON.stringify(process.execPath)}`) && section.includes(MCP_SERVER) } : { exists: false };
+  } catch (error) {
+    if (error.code === "ENOENT") return { exists: false };
+    console.warn(`  warning: could not inspect ${path}: ${error.message}`);
+    return { exists: true, same: false };
+  }
+}
+
+async function registerMcp(host) {
+  const existing = await existingMcp(host);
+  if (existing.exists) {
+    if (existing.same) console.log(`  already registered  ${MCP_NAME} MCP server with ${host.id}`);
+    else console.warn(`  warning: ${host.id} already has MCP server "${MCP_NAME}"; leaving it unchanged`);
+    return;
+  }
+  const help = await runFile(host.cli, ["mcp", "--help"]);
+  if (help.error) {
+    console.warn(`  warning: ${host.id} CLI has no detected MCP interface; skill install kept`);
+    return;
+  }
+  const listed = await runFile(host.cli, ["mcp", "list"]);
+  if (!listed.error && new RegExp(`(^|\\s)${MCP_NAME}(\\s|$)`, "i").test(listed.stdout)) {
+    console.warn(`  warning: ${host.id} already has MCP server "${MCP_NAME}"; leaving it unchanged`);
+    return;
+  }
+  const args = host.id === "claude"
+    ? ["mcp", "add-json", "--scope", "user", MCP_NAME, JSON.stringify(MCP_CONFIG)]
+    : ["mcp", "add", MCP_NAME, "--", process.execPath, MCP_SERVER];
+  const result = await runFile(host.cli, args);
+  if (result.error) console.warn(`  warning: could not register ${host.id} MCP server: ${result.stderr.trim() || result.error.message}`);
+  else console.log(`  registered  ${MCP_NAME} MCP server with ${host.id}`);
+}
+
+async function installFactoryMcp() {
+  if (!(await commandAvailable("droid"))) return;
+  const dir = join(homedir(), ".factory");
+  const path = join(dir, "mcp.json");
+  let config = {};
+  try {
+    config = JSON.parse(await readFile(path, "utf8"));
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      console.warn(`  warning: could not read ${path}: ${error.message}`);
+      return;
+    }
+  }
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    console.warn(`  warning: Factory MCP config is not a JSON object; leaving it unchanged`);
+    return;
+  }
+  if (config.mcpServers !== undefined && (!config.mcpServers || typeof config.mcpServers !== "object" || Array.isArray(config.mcpServers))) {
+    console.warn(`  warning: Factory MCP server registry is not an object; leaving it unchanged`);
+    return;
+  }
+  const servers = config.mcpServers && typeof config.mcpServers === "object" ? config.mcpServers : {};
+  if (servers[MCP_NAME]) {
+    if (JSON.stringify(servers[MCP_NAME]) === JSON.stringify(MCP_CONFIG)) console.log(`  already registered  ${MCP_NAME} MCP server with factory`);
+    else console.warn(`  warning: Factory already has MCP server "${MCP_NAME}"; leaving it unchanged`);
+    return;
+  }
+  await mkdir(dir, { recursive: true });
+  const temp = `${path}.${process.pid}.tmp`;
+  await writeFile(temp, `${JSON.stringify({ ...config, mcpServers: { ...servers, [MCP_NAME]: MCP_CONFIG } }, null, 2)}\n`, { mode: 0o600 });
+  await rename(temp, path);
+  console.log(`  registered  ${MCP_NAME} MCP server with factory → ${path}`);
+}
+
 async function install() {
   for (const host of HOSTS) {
-    const skillDir = join(homedir(), ...host.skills);
-    const commandDir = join(homedir(), ...host.commands);
-    await mkdir(skillDir, { recursive: true });
-    await mkdir(commandDir, { recursive: true });
-    for (const name of SKILLS) {
-      await cp(join(PKG_ROOT, "skills", name), join(skillDir, name), { recursive: true, force: true });
+    try {
+      await installHost(host);
+    } catch (error) {
+      console.warn(`  warning: ${host.id} install skipped: ${error.message}`);
     }
-    for (const file of COMMAND_FILES) {
-      await cp(join(PKG_ROOT, "commands", file), join(commandDir, file), { force: true });
-    }
-    console.log(`  installed  ${SKILLS.join(", ")}  →  ${skillDir}`);
-    console.log(`             ${COMMAND_FILES.map((f) => `/${f.replace(".md", "")}`).join(", ")}  →  ${commandDir}`);
+  }
+  try {
+    await installFactoryMcp();
+  } catch (error) {
+    console.warn(`  warning: Factory MCP registration skipped: ${error.message}`);
   }
 
-  const result = await scan({});
-  console.log(`  role map   ${result.count} roles across ${result.domains} domains  →  ${MAP_DIR}`);
+  try {
+    const result = await scan({});
+    console.log(`  role map   ${result.count} roles across ${result.domains} domains  →  ${MAP_DIR}`);
+  } catch (error) {
+    console.warn(`  warning: role map scan skipped: ${error.message}`);
+  }
 
   const detected = (await detectAll()).filter((d) => d.installed).map((d) => d.id);
   console.log(
@@ -262,7 +403,10 @@ async function cmdRun(positional, flags) {
     await saveLedger(ctx.root, ledger);
     await printGate(ctx.root, gate.id);
 
-    if (!result.ok) throw exit(`gate ${gate.n} (${gate.id}) did not produce valid artifacts`, 1);
+    if (!result.ok) {
+      const prefix = result.harnessFailure ? "harness failure: " : "";
+      throw exit(`gate ${gate.n} (${gate.id}) did not produce valid artifacts — ${prefix}${result.detail ?? "validation failed"}`, 1);
+    }
     if (!all) {
       console.log(`\n  human review, then: ${style.lime(`astra approve ${gate.id}`)} && ${style.lime("astra advance")}\n`);
       return;
@@ -320,7 +464,7 @@ async function cmdApprove(positional, flags) {
       4,
     );
   }
-  const { ok } = await checkGate(run.root, gateId);
+  const { ok } = await checkGate(run.root, gateId, { requireMaterialization: gateId === "product" });
   if (!ok) throw exit(`gate "${gateId}" artifacts are invalid — nothing to approve`, 1);
 
   run.ledger = markCleared(run.ledger, gateId, "human");

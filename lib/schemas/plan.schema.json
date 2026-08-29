@@ -71,7 +71,16 @@
             }
           },
           "task": { "type": "string", "description": "node-specific instruction appended to the role prompt" },
-          "command": { "type": "string", "description": "shell verification command; when present the node runs it instead of invoking the agent" },
+          "command": {
+            "type": "object",
+            "required": ["program", "args"],
+            "additionalProperties": false,
+            "description": "exact executable and argv for a mechanical verification; runs without a shell",
+            "properties": {
+              "program": { "type": "string", "minLength": 1 },
+              "args": { "type": "array", "items": { "type": "string" } }
+            }
+          },
           "assertions": { "type": "array", "items": { "type": "string" } }
         }
       }

@@ -18,7 +18,7 @@ const themeMedia = globalThis.matchMedia?.("(prefers-color-scheme: light)");
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 const GATES = [
-  { id: "product", n: 1, name: "Product Intent & Visual Spec", artifactKeys: ["uiLayout"], docKey: "product" },
+  { id: "product", n: 1, name: "Product Intent & User Story", artifactKeys: ["userStory"], docKey: "product" },
   { id: "architecture", n: 2, name: "Architecture & Adversarial Audit", artifactKeys: ["systemArchitecture", "audit"], docKey: "architecture" },
   { id: "design", n: 3, name: "Program Design & Contract Hardening", artifactKeys: ["callStackTypes"], docKey: "programDesign" },
   { id: "plan", n: 4, name: "Graph Engineering & Agent Role Allocation", artifactKeys: ["plan"], docKey: "slices" },
@@ -26,6 +26,7 @@ const GATES = [
 ];
 
 const ARTIFACT_LABELS = {
+  userStory: "USER STORY",
   uiLayout: "UI LAYOUT",
   systemArchitecture: "ARCH",
   audit: "AUDIT",
@@ -42,7 +43,14 @@ const KIND_COLORS = {
   e2e: "var(--vermilion)",
 };
 
-const app = { state: null, localDrop: false, sequenceId: 0 };
+const app = {
+  state: null,
+  localDrop: false,
+  sequenceId: 0,
+  disclosures: new Map(),
+  modalReturnFocus: null,
+  modalReturnFocusKey: null,
+};
 const THEME_MODES = ["auto", "dark", "light"];
 let themeMode = THEME_MODES.includes(themeRoot.dataset.theme) ? themeRoot.dataset.theme : "auto";
 
@@ -121,15 +129,27 @@ function chip(value, extraClass = "") {
   return node("span", `chip ${safeClass} ${extraClass}`.trim(), { text: value });
 }
 
-function section(id, eyebrow, title, content) {
-  const panel = node("section", "panel", { id });
-  const heading = node("div", "panel-heading", {}, [
+function section(id, eyebrow, title, content, { open = true } = {}) {
+  const panel = node("details", "panel", { id });
+  panel.open = app.disclosures.has(id) ? app.disclosures.get(id) : open;
+  const heading = node("summary", "panel-heading", {}, [
     node("h2", "", { text: title }),
     node("span", "eyebrow", { text: eyebrow }),
   ]);
-  panel.append(heading, content);
+  panel.addEventListener("toggle", () => app.disclosures.set(id, panel.open));
+  panel.append(heading, node("div", "panel-content", {}, [content]));
   return panel;
 }
+
+consoleRoot?.addEventListener("click", (event) => {
+  const link = event.target.closest?.('a[href^="#artifact-"]');
+  if (!link) return;
+  const target = document.querySelector(link.getAttribute("href"));
+  if (target instanceof HTMLDetailsElement) {
+    target.open = true;
+    app.disclosures.set(target.id, true);
+  }
+});
 
 function empty(message) {
   return node("div", "empty", { text: message });
@@ -186,7 +206,10 @@ function renderGateRail(data) {
       chip(stateGate.status || "pending"),
     );
     const artifacts = node("div", "gate-artifacts");
-    for (const key of gate.artifactKeys) {
+    const artifactKeys = gate.id === "product" && !data?.artifacts?.userStory && data?.artifacts?.uiLayout
+      ? ["uiLayout"]
+      : gate.artifactKeys;
+    for (const key of artifactKeys) {
       const present = data?.artifacts?.[key] !== null && data?.artifacts?.[key] !== undefined;
       const label = node("span", "artifact-link", { text: `${present ? "●" : "○"} ${ARTIFACT_LABELS[key]}` });
       if (present) {
@@ -348,7 +371,276 @@ function renderMockElement(item = {}) {
   return node("div", `mock-element mock-${type}`, {}, [result]);
 }
 
+const WIRE_COMPONENT_TYPES = {
+  heading: "heading",
+  text: "text",
+  label: "text",
+  paragraph: "text",
+  button: "button",
+  iconbutton: "button",
+  input: "input",
+  textarea: "input",
+  select: "select",
+  checkbox: "checkbox",
+  radio: "checkbox",
+  toggle: "checkbox",
+  table: "table",
+  list: "list",
+  card: "card",
+  image: "image",
+  topbar: "nav",
+  sidebar: "nav",
+  sidebarmenu: "nav",
+  breadcrumbs: "nav",
+  tabs: "nav",
+  chart: "chart",
+  stat: "card",
+  code: "terminal",
+  badge: "badge",
+  link: "button",
+  alert: "card",
+  modal: "modal",
+};
+
+function wireItems(value) {
+  if (Array.isArray(value)) return value.map((entry) => ({ label: text(entry) }));
+  return text(value).split(",").map((entry) => entry.trim()).filter(Boolean).map((entry) => ({ label: entry }));
+}
+
+function wireComponent(component) {
+  const props = component?.props ?? {};
+  const componentName = text(component?.componentType || "Text");
+  const type = WIRE_COMPONENT_TYPES[componentName.toLowerCase()] ?? "text";
+  const label = props.text ?? props.label ?? props.title ?? props.value ?? componentName;
+  const item = {
+    type,
+    label: text(label),
+    notes: text(props.placeholder ?? props.subtitle ?? props.description ?? ""),
+  };
+  if (props.items !== undefined) item.children = wireItems(props.items);
+  if (componentName.toLowerCase() === "table") {
+    item.children = wireItems(props.columns ?? props.items ?? "Column 1,Column 2");
+  }
+  return renderMockElement(item);
+}
+
+function renderWireNode(item) {
+  if (item?.type === "component") return wireComponent(item);
+  const kind = item?.type === "cell" ? "cell" : text(item?.layoutType || "stack").toLowerCase();
+  const attributes = { "data-wire-layout": kind };
+  if (item?.params?.direction) attributes["data-direction"] = text(item.params.direction).toLowerCase();
+  const container = node("div", `wire-layout wire-${kind}`, attributes);
+  if (kind === "grid") {
+    const columns = Number(item?.params?.columns);
+    if (Number.isInteger(columns) && columns > 0 && columns <= 12) {
+      container.style.setProperty("--wire-columns", String(columns));
+    }
+  }
+  for (const child of item?.children ?? []) container.append(renderWireNode(child));
+  return container;
+}
+
+function userStoryFlow(story) {
+  return typeof story?.mermaid === "string" ? story.mermaid.trim() : "";
+}
+
+function userStorySurface(story) {
+  return story?.meta?.surface === "ui" ? "ui" : "non-ui";
+}
+
+function userStorySummary(story) {
+  return text(story?.meta?.intent).trim();
+}
+
+let mermaidModulePromise;
+let mermaidInstance;
+
+async function loadMermaid() {
+  if (!mermaidModulePromise) {
+    mermaidModulePromise = import("/vendor/mermaid/mermaid.esm.min.mjs").then((module) => {
+      const candidate = module?.default ?? module?.mermaid ?? module;
+      mermaidInstance = candidate?.default ?? candidate;
+      if (!mermaidInstance || typeof mermaidInstance.render !== "function") {
+        throw new Error("Mermaid module did not expose render()");
+      }
+      mermaidInstance.initialize?.({
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: "base",
+      });
+      return mermaidInstance;
+    });
+  }
+  return mermaidModulePromise;
+}
+
+function safeMermaidSvg(svg) {
+  const template = document.createElement("template");
+  template.innerHTML = text(svg);
+  template.content.querySelectorAll("script, foreignObject, a").forEach((element) => element.remove());
+  template.content.querySelectorAll("*").forEach((element) => {
+    for (const attribute of [...element.attributes]) {
+      if (/^on/i.test(attribute.name) || /^(?:href|xlink:href)$/i.test(attribute.name)) element.removeAttribute(attribute.name);
+    }
+  });
+  return template.content;
+}
+
+// Dropped state is untrusted browser input. Mermaid directives, click handlers, and links are
+// outside the User Story display contract, even when Mermaid's strict mode is unavailable.
+function safeMermaidSource(source) {
+  const value = text(source).trim();
+  if (!value) return "";
+  if (/(?:%%\{|\}%%|\bclick\b|\blinkStyle\b)/i.test(value)) return null;
+  if (/(?:[a-z][a-z0-9+.-]{1,31}:|\/\/|www\.)[^\s<>"']+/i.test(value)) return null;
+  return value;
+}
+
+async function renderMermaidFlow(container, source) {
+  const safeSource = safeMermaidSource(source);
+  if (safeSource === null) {
+    container.replaceChildren(
+      node("p", "story-error", { role: "alert", text: "MERMAID FLOW CONTAINS UNSUPPORTED DIRECTIVES OR LINKS" }),
+      node("pre", "mermaid-source", { tabIndex: "0", "aria-label": "Mermaid flow source", text: source }),
+    );
+    return;
+  }
+  if (!safeSource) {
+    container.replaceChildren(empty("NO MERMAID FLOW PROVIDED"));
+    return;
+  }
+  container.replaceChildren(node("p", "story-loading", { role: "status", text: "RENDERING INTERACTION FLOW…" }));
+  try {
+    const mermaid = await loadMermaid();
+    const renderId = `user-story-flow-${++app.sequenceId}`;
+    const result = await mermaid.render(renderId, safeSource);
+    const svg = node("div", "mermaid-svg", { role: "img", "aria-label": "User interaction flow diagram" });
+    svg.append(safeMermaidSvg(result?.svg));
+    container.replaceChildren(svg);
+  } catch (error) {
+    container.replaceChildren(
+      node("p", "story-error", { role: "alert", text: `MERMAID RENDER ERROR // ${error?.message || "unknown error"}` }),
+      node("pre", "mermaid-source", { tabIndex: "0", "aria-label": "Mermaid flow source", text: safeSource }),
+    );
+  }
+}
+
+const USER_STORY_ROUTES = Object.freeze({
+  preview: "/api/artifacts/user-story/preview",
+  previewDownload: "/api/artifacts/user-story/preview?download=1",
+  design: "/api/artifacts/user-story/design",
+});
+
+function artifactUrl(kind) {
+  return USER_STORY_ROUTES[kind];
+}
+
+function artifactDownload(label, href, filename, disabled = false) {
+  if (disabled || !href) return node("span", "artifact-download unavailable", { text: `${label} UNAVAILABLE` });
+  return node("a", "artifact-download", { href, download: filename, text: label });
+}
+
+function openUserStoryModal(story, preview, design, trigger) {
+  rememberModalFocus(trigger);
+  const title = text(story?.meta?.title || story?.title || "USER STORY // UI DEMONSTRATION");
+  docModalTitle.textContent = title;
+  docModalMeta.textContent = [
+    preview?.path ? `${preview.path} // ${preview.bytes ?? "?"} BYTES` : "PREVIEW UNAVAILABLE",
+    design?.path ? `${design.path} // EDITABLE DESIGN` : "EDITABLE DESIGN UNAVAILABLE",
+  ].join(" · ");
+  const body = node("div", "story-modal");
+  if (preview) {
+    const image = node("img", "story-modal-image", {
+      src: artifactUrl("preview"),
+      alt: `${title} OpenPencil UI demonstration`,
+    });
+    image.addEventListener("error", () => {
+      image.replaceWith(node("p", "story-error", { role: "alert", text: "UI PREVIEW COULD NOT BE LOADED" }));
+    }, { once: true });
+    body.append(node("figure", "story-modal-figure", {}, [image, node("figcaption", "muted", { text: "READ-ONLY OPENPENCIL PREVIEW" })]));
+  } else {
+    body.append(empty("UI PREVIEW UNAVAILABLE"));
+  }
+  body.append(node("div", "artifact-actions", {}, [
+    artifactDownload("DOWNLOAD PNG", artifactUrl("previewDownload"), "user-story.png", !preview),
+    artifactDownload("DOWNLOAD .FIG", artifactUrl("design"), "user-story.fig", !design),
+  ]));
+  docModalBody.replaceChildren(body);
+  docModalBody.scrollTop = 0;
+  if (typeof docModal.showModal === "function" && !docModal.open) docModal.showModal();
+  docModalClose.focus();
+}
+
+function renderUserStory(data) {
+  const story = data?.artifacts?.userStory;
+  if (!story) return null;
+  const surface = userStorySurface(story);
+  const flow = userStoryFlow(story);
+  const content = node("div", "user-story-content");
+  const summary = userStorySummary(story);
+  if (summary) content.append(node("p", "user-story-summary", { text: summary }));
+
+  const flowContainer = node("div", "mermaid-flow", {
+    role: "region",
+    "aria-label": "User interaction flow",
+    "aria-live": "polite",
+  });
+  content.append(node("div", "story-block", {}, [
+    node("h3", "subheading", { text: "INTERACTION FLOW // MERMAID" }),
+    flowContainer,
+  ]));
+  void renderMermaidFlow(flowContainer, flow);
+
+  const sourceDisclosure = node("details", "story-source");
+  sourceDisclosure.append(
+    node("summary", "story-source-heading", { text: "MERMAID SOURCE" }),
+    node("pre", "mermaid-source", { tabIndex: "0", "aria-label": "Mermaid flow source", text: flow || "(missing)" }),
+  );
+  content.append(sourceDisclosure);
+
+  if (surface === "ui") {
+    const preview = data?.artifacts?.userStoryPreview;
+    const design = data?.artifacts?.userStoryDesign;
+    const previewBlock = node("div", "story-block");
+    previewBlock.append(node("h3", "subheading", { text: "UI DEMONSTRATION // OPENPENCIL" }));
+    if (preview) {
+      const trigger = node("button", "story-preview-trigger", {
+        type: "button",
+        "aria-label": "Open the User Story UI demonstration in a larger viewer",
+        "data-modal-trigger": "user-story-preview",
+      });
+      const image = node("img", "story-preview-image", {
+        src: artifactUrl("preview"),
+        alt: `${text(story?.meta?.title || story?.title || "User Story")} UI demonstration thumbnail`,
+        loading: "lazy",
+      });
+      image.addEventListener("error", () => {
+        trigger.replaceChildren(node("span", "story-error", { role: "alert", text: "UI PREVIEW UNAVAILABLE" }));
+        trigger.disabled = true;
+      }, { once: true });
+      trigger.append(image, node("span", "story-preview-caption", { text: "POP OUT" }));
+      trigger.addEventListener("click", () => openUserStoryModal(story, preview, design, trigger));
+      previewBlock.append(trigger);
+    } else {
+      previewBlock.append(empty("UI PREVIEW UNAVAILABLE // OPENPENCIL ARTIFACT NOT FOUND"));
+    }
+    previewBlock.append(node("div", "artifact-actions", {}, [
+      artifactDownload("DOWNLOAD PNG", artifactUrl("previewDownload"), "user-story.png", !preview),
+      artifactDownload("DOWNLOAD .FIG", artifactUrl("design"), "user-story.fig", !design),
+    ]));
+    content.append(previewBlock);
+  }
+
+  return section("artifact-userStory", "GATE 01 // USER STORY", "User Story", content, { open: true });
+}
+
+function wireScreen(layout, id) {
+  return layout?.wireframes?.project?.screens?.find((screen) => screen.name === id) ?? null;
+}
+
 function renderUiLayout(data) {
+  // New runs use the User Story renderer; keep this path for pre-User-Story runs.
+  if (data?.artifacts?.userStory) return null;
   const layout = data?.artifacts?.uiLayout;
   if (!layout) return null;
   const content = node("div");
@@ -359,12 +651,17 @@ function renderUiLayout(data) {
   const grid = node("div", "screen-grid");
   for (const screen of screens) {
     const card = node("article", "screen-card", { id: `screen-${text(screen.id)}` });
+    const parsedScreen = wireScreen(data, screen.id);
     const title = node("div", "screen-title", {}, [
       node("h3", "", { text: `${text(screen.id)} // ${text(screen.name)}` }),
-      chip("SANDBOX"),
+      chip(parsedScreen ? "WIRE DSL" : "LEGACY HTML"),
     ]);
     const frame = node("div", "screen-frame", { role: "region", "aria-label": `${text(screen.name)} mockup` });
-    for (const element of screen.elements ?? []) frame.append(renderMockElement(element));
+    if (parsedScreen) {
+      for (const element of parsedScreen.children ?? []) frame.append(renderWireNode(element));
+    } else {
+      for (const element of screen.elements ?? []) frame.append(renderMockElement(element));
+    }
     const aside = node("aside", "screen-aside");
     aside.append(
       node("div", "aside-block", {}, [
@@ -380,6 +677,9 @@ function renderUiLayout(data) {
     grid.append(card);
   }
   content.append(grid);
+  if (!data?.wireframes?.ok && !data?.wireframes?.legacy) {
+    content.append(node("p", "wire-warning", { text: `WIRE DSL FALLBACK // ${data.wireframes.error}` }));
+  }
   const flows = layout.flows ?? [];
   if (flows.length) {
     const flowList = node("div", "flows");
@@ -394,7 +694,7 @@ function renderUiLayout(data) {
     }
     content.append(flowList);
   }
-  return section("artifact-uiLayout", "GATE 01 // VISUAL INTENT", "UI mockups", content);
+  return section("artifact-uiLayout", "GATE 01 // OPTIONAL VISUAL INTENT", "UI mockups", content, { open: false });
 }
 
 function serviceGroups(architecture) {
@@ -546,7 +846,7 @@ function renderArchitecture(data) {
       riskFlags(architecture.riskFlags),
     ]));
   }
-  return section("artifact-systemArchitecture", "GATE 02 // SYSTEM SHAPE", "Architecture", content);
+  return section("artifact-systemArchitecture", "GATE 02 // SYSTEM SHAPE", "Architecture", content, { open: data?.ledger?.phase === "architecture" });
 }
 
 /** The solo judge was renamed to Grunt; runs recorded before the rename still say Sideeye. */
@@ -591,7 +891,7 @@ function renderAudit(data) {
   }
   if (audit.personas?.length) content.append(personas);
   if (audit.dissent) content.append(node("p", "audit-dissent", { text: `DISSENT // ${audit.dissent}` }));
-  return section("artifact-audit", "GATE 02 // ADVERSARIAL JUDGE", "Audit tribunal", content);
+  return section("artifact-audit", "GATE 02 // ADVERSARIAL JUDGE", "Audit tribunal", content, { open: data?.ledger?.phase === "architecture" });
 }
 
 function renderContracts(data) {
@@ -671,7 +971,7 @@ function renderContracts(data) {
       dataTable(["BOUNDARY", "SHAPE", "VALIDATOR"], contracts.typeBoundaries.map((boundary) => [boundary.boundary, boundary.shape, boundary.validator || "—"])),
     ]));
   }
-  return section("artifact-callStackTypes", "GATE 03 // CONTRACTS", "Program design", content);
+  return section("artifact-callStackTypes", "GATE 03 // CONTRACTS", "Program design", content, { open: data?.ledger?.phase === "design" });
 }
 
 function topologicalWaves(nodes) {
@@ -769,7 +1069,7 @@ function renderPlan(data) {
   const legend = node("div", "kind-legend");
   for (const kind of Object.keys(KIND_COLORS)) legend.append(node("span", `chip kind-${kind}`, {}, kind));
   content.append(legend);
-  return section("artifact-plan", "GATE 04 // GRAPH ENGINEERING", "Executable DAG", content);
+  return section("artifact-plan", "GATE 04 // GRAPH ENGINEERING", "Executable DAG", content, { open: data?.ledger?.phase === "plan" });
 }
 
 function duration(value) {
@@ -837,7 +1137,9 @@ function renderExecution(data) {
     }
     content.append(node("h3", "subheading", { text: "EVENT LOG // NEWEST LAST" }), eventList);
   }
-  return section("artifact-execution", "GATE 05 // LIVE TELEMETRY", "Execution", content);
+  return section("artifact-execution", "GATE 05 // LIVE TELEMETRY", "Execution", content, {
+    open: data?.ledger?.phase === "execute" || execution.status === "running",
+  });
 }
 
 /** The headless agent CLI writes to disk, not to the operator's TUI, so tail its transcript here. */
@@ -862,7 +1164,7 @@ function renderLogFeed(data) {
       "log-table",
     ));
   }
-  return section("artifact-logs", "AGENT CLI // ROLLING TAIL", "Transcript", content);
+  return section("artifact-logs", "AGENT CLI // ROLLING TAIL", "Transcript", content, { open: false });
 }
 
 // markdownToHtml escapes every text run and restricts link targets, so innerHTML is safe here.
@@ -870,6 +1172,27 @@ function renderMarkdown(markdown) {
   const wrapper = node("div", "markdown");
   wrapper.innerHTML = markdownToHtml(markdown);
   return wrapper;
+}
+
+function rememberModalFocus(trigger) {
+  app.modalReturnFocus = trigger instanceof HTMLElement ? trigger : null;
+  app.modalReturnFocusKey = app.modalReturnFocus?.dataset.modalTrigger || null;
+}
+
+function findModalReturnFocus() {
+  if (app.modalReturnFocus && document.contains(app.modalReturnFocus)) return app.modalReturnFocus;
+  if (!app.modalReturnFocusKey) return null;
+  for (const element of document.querySelectorAll("[data-modal-trigger]")) {
+    if (element.dataset.modalTrigger === app.modalReturnFocusKey) return element;
+  }
+  return null;
+}
+
+function restoreModalFocus() {
+  const returnFocus = findModalReturnFocus();
+  app.modalReturnFocus = null;
+  app.modalReturnFocusKey = null;
+  if (returnFocus) returnFocus.focus();
 }
 
 const DOC_LABELS = {
@@ -886,7 +1209,8 @@ function docId(path) {
   return `doc-${path.replace(/[^\w-]+/g, "-")}`;
 }
 
-function openDocModal(doc, label) {
+function openDocModal(doc, label, trigger) {
+  rememberModalFocus(trigger || document.activeElement);
   docModalTitle.textContent = label;
   docModalMeta.textContent = `${doc.path} // ${doc.bytes} BYTES`;
   docModalBody.replaceChildren(renderMarkdown(doc.markdown));
@@ -914,15 +1238,16 @@ function renderDocs(data) {
       type: "button",
       text: "POP OUT",
       "aria-label": `Open ${label} in a larger viewer`,
+      "data-modal-trigger": `doc:${doc.path}`,
     });
-    expand.addEventListener("click", () => openDocModal(doc, label));
+    expand.addEventListener("click", () => openDocModal(doc, label, expand));
     content.append(node("article", "doc-card", { id: docId(doc.path) }, [
       node("div", "doc-card-head", {}, [node("h3", "", { text: label }), expand]),
       node("p", "doc-meta", { text: `${doc.path} // ${doc.bytes} BYTES` }),
       renderMarkdown(doc.markdown),
     ]));
   }
-  return section("docs", "ARTIFACT DOCUMENTS", "Document viewers", content);
+  return section("docs", "ARTIFACT DOCUMENTS", "Document viewers", content, { open: false });
 }
 
 function collectOpenQuestions(value, output = [], seen = new Set()) {
@@ -1035,7 +1360,7 @@ function renderSession(data) {
     ]), "worker-table"));
   }
   for (const warning of session.warnings ?? []) cards.append(node("p", "session-note", { text: `WARNING // ${warning}` }));
-  return section("session", "DURABLE BROKER", "Session, harness & budget", cards);
+  return section("session", "DURABLE BROKER", "Session, harness & budget", cards, { open: false });
 }
 
 function renderReviewFooter(data) {
@@ -1049,7 +1374,9 @@ function renderReviewFooter(data) {
     content.append(node("p", "session-note", { text: "Questions are read-only. Answer them in your agent session." }));
   }
   const grid = node("div", "review-grid");
-  for (const gate of GATES) {
+  const currentGate = GATES.find((gate) => gate.id === data?.ledger?.phase);
+  const reviewGates = currentGate && !data?.ledger?.complete ? [currentGate] : [];
+  for (const gate of reviewGates) {
     const textarea = node("textarea", "", { "aria-label": `${gate.name} review notes`, placeholder: "NOTES // required changes, evidence, decision context" });
     const approve = node("button", "review-button approve", { type: "button", text: "APPROVE" });
     const changes = node("button", "review-button changes", { type: "button", text: "REQUEST CHANGES" });
@@ -1064,6 +1391,7 @@ function renderReviewFooter(data) {
       state,
     ]));
   }
+  if (!reviewGates.length) grid.append(empty("NO OPEN GATE REQUIRES REVIEW"));
   content.append(grid);
   return content;
 }
@@ -1071,11 +1399,13 @@ function renderReviewFooter(data) {
 function renderState(data) {
   app.state = data;
   updateHeader(data);
+  // SSE replaces the trigger subtree while an open dialog remains mounted.
+  if (docModal.open && app.modalReturnFocus && !document.contains(app.modalReturnFocus)) app.modalReturnFocus = null;
   consoleRoot.replaceChildren();
   const session = renderSession(data);
   if (session) consoleRoot.append(session);
   consoleRoot.append(renderGateRail(data));
-  const renderers = [renderUiLayout, renderArchitecture, renderAudit, renderContracts, renderPlan, renderExecution, renderLogFeed];
+  const renderers = [renderUserStory, renderUiLayout, renderArchitecture, renderAudit, renderContracts, renderPlan, renderExecution, renderLogFeed];
   const interaction = renderInteraction(data);
   if (interaction) consoleRoot.append(interaction);
   for (const renderer of renderers) {
@@ -1088,6 +1418,7 @@ function renderState(data) {
 }
 
 function classifyDrop(data) {
+  if (data?.meta?.surface && data?.mermaid) return "userStory";
   if (data?.screens && data?.meta?.intent) return "uiLayout";
   if (data?.services && data?.sequences) return "systemArchitecture";
   if (data?.personas && data?.verdict) return "audit";
@@ -1168,7 +1499,10 @@ window.addEventListener("drop", async (event) => {
 });
 
 docModalClose.addEventListener("click", closeDocModal);
-docModal.addEventListener("close", () => docModalBody.replaceChildren());
+docModal.addEventListener("close", () => {
+  docModalBody.replaceChildren();
+  restoreModalFocus();
+});
 // Clicking the backdrop lands on the dialog itself, never on its children.
 docModal.addEventListener("click", (event) => {
   if (event.target === docModal) closeDocModal();

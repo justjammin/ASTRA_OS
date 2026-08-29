@@ -3,9 +3,9 @@ description: Run the Astra OS five-gate factory on an intent, driven end to end 
 argument-hint: <intent> [--agent claude|droid|opencode|hermes|codex] [--judge solo|magi]
 ---
 
-Invoke the `astra` skill on: $ARGUMENTS
+Drive the local `astra` CLI for: $ARGUMENTS
 
-Follow the skill exactly. Non-negotiable points:
+Follow this sequence:
 
 1. Confirm the intent is specific enough. If it is not, ask one focused batch of 2-3 questions before Gate 1. Do not expand vagueness into invented requirements.
 2. Run `astra start "<intent>"` with the chosen agent and judge mode. Do not compose the readiness block by hand; the command prints it from the ledger.

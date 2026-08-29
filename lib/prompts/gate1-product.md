@@ -28,19 +28,29 @@ Markdown, in this exact section order:
 
 Technical jargon of any kind: framework names, database names, API/endpoint/schema/queue/cache/microservice/index/migration, class or function names, file paths in prose, latency or throughput figures. If you cannot say it to a non-engineer, it belongs in Gate 2.
 
-## Deliverable 2 — `{{UI_LAYOUT_PATH}}`
+## Deliverable 2 — `{{USER_STORY_PATH}}`
 
 JSON validating against this schema:
 
 ```json
-{{UI_LAYOUT_SCHEMA}}
+{{USER_STORY_SCHEMA}}
 ```
 
 Rules:
-- One screen per state a human actually looks at. `elements` describes structure and copy, never CSS or components from a specific framework.
-- `acceptance` on each screen is what the human should be able to do on it.
-- If this product genuinely has no visual surface (a library, a CLI-only tool), set `meta.headless` to `true` and describe the terminal surface with `terminal` elements instead of leaving screens empty.
+- Every user story includes a Mermaid flowchart in `mermaid`; it is the canonical explanation of the user's interaction flow.
+- Set `meta.surface` to `ui` when a human interacts with a graphical screen or component. Set it to `non-ui` for a CLI, library, service, or other product with no graphical screen.
+- For `ui`, include one screen per state a human actually looks at. `elements` describes structure and copy, never CSS or components from a specific framework. `acceptance` on each screen is what the human should be able to do on it.
+- For `non-ui`, omit `screens`; do not invent a visual screen for an internal process or terminal output.
 - `meta.slug` must be exactly `{{SLUG}}`. `meta.intent` restates the intent in one sentence.
+- Keep Mermaid source portable: use a `flowchart` (or `graph`) declaration with a direction and labeled nodes/edges. Do not embed HTML, scripts, URLs, or framework syntax.
+
+Minimal `mermaid` shape:
+
+```mermaid
+flowchart TD
+  start[User opens the product] --> ready[User sees the starting state]
+  ready --> done[User completes the job]
+```
 
 ## Rules of engagement
 

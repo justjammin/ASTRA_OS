@@ -1,7 +1,7 @@
 {
   "name": "astra-os-factory",
-  "version": "0.1.0",
-  "description": "Astra's five-gate software factory with a local MCP control surface.",
+  "version": "0.2.2",
+  "description": "Astra's five-gate software factory with Mermaid interaction flows, optional OpenPencil UI stories, and a local MCP control surface.",
   "skills": "./skills/",
   "commands": "./commands/",
   "mcpServers": "./mcp.json",
@@ -11,4 +11,3 @@
     "category": "Coding"
   }
 }
-

@@ -1,6 +1,6 @@
 {
   "name": "@ninjamin/astra-os",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "type": "module",
   "description": "Astra OS — a portable agent harness that drives one coding agent (Pi SDK or claude, droid, opencode, hermes, codex) through five front-loaded software-factory gates: product intent, architecture with adversarial audit, program design contracts, DAG planning with scoped agent roles, and testing-trophy execution streamed to a retro visualizer.",
   "bin": {
@@ -17,6 +17,7 @@
     "site:dev": "npx wrangler@4 dev --config site.wrangler.jsonc",
     "site:deploy": "npx wrangler@4 deploy --config site.wrangler.jsonc",
     "release:pack": "npm pack",
+    "postinstall": "node bin/astra.mjs install --postinstall",
     "prepublishOnly": "npm test"
   },
   "files": [
@@ -67,7 +68,10 @@
     "@langchain/langgraph": "^1.4.10"
   },
   "dependencies": {
+    "@anthropic-ai/sandbox-runtime": "0.0.67",
     "@earendil-works/pi-coding-agent": "^0.84.2",
+    "@open-pencil/cli": "0.14.0",
+    "mermaid": "11.17.2",
     "zod": "^4.4.3"
   },
   "peerDependencies": {

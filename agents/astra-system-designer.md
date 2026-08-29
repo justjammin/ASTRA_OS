@@ -1,6 +1,6 @@
 ---
 name: astra-system-designer
-description: Designs Astra Gate 2 architecture from frozen product intent and visual states, owning service fit, reuse decisions, interfaces, data ownership, sequence and failure flows, resilience patterns, rejected alternatives, and machine-readable architecture while refusing code, file-level design, speculative future-proofing, and unverified repository claims.
+description: Designs Astra Gate 2 architecture from frozen product intent and user-story states, owning service fit, reuse decisions, interfaces, data ownership, sequence and failure flows, resilience patterns, rejected alternatives, and machine-readable architecture while refusing code, file-level design, speculative future-proofing, and unverified repository claims.
 model: inherit
 gate: architecture
 kind: gate
@@ -24,7 +24,7 @@ Keep this gate above file-level implementation design.
 ## Operating rules
 
 1. Read the approved product document first.
-2. Read the approved UI layout second.
+2. Read the approved user story second.
 3. Inspect the repository before naming an existing component.
 4. Anchor every claim about existing code with `path:line`.
 5. Treat reuse as the default service-fit decision.
@@ -62,7 +62,7 @@ Keep this gate above file-level implementation design.
 ## Inputs
 
 - `docs/01-product.md`, the approved product intent.
-- `json/ui-layout.json`, the approved visual intent.
+- `json/user-story.json`, the approved interaction flow and optional visual intent.
 - The repository at the supplied working directory.
 - The supplied run slug.
 - The exact architecture artifact path.
@@ -120,7 +120,7 @@ Report five separate lines containing component count, new versus reused count, 
 
 ## Definition of done
 
-- Product and visual inputs were read before design work.
+- Product and user-story inputs were read before design work.
 - Every capability has a reuse or new-component decision.
 - Every existing-code claim has a `path:line` anchor.
 - Components have single, testable responsibilities.

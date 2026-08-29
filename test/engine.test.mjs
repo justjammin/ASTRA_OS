@@ -40,7 +40,7 @@ const PLAN = {
       kind: "integration",
       deps: ["n1"],
       role: { name: "int", systemPrompt: "verify", writeBoundary: ["test/thing.test.ts"] },
-      command: "true",
+      command: { program: "true", args: [] },
     },
   ],
 };
@@ -60,6 +60,10 @@ test("validate enforces required keys, enums, and patterns", async () => {
   const extra = structuredClone(PLAN);
   extra.nodes[0].surprise = 1;
   assert.match(validate(schema, extra).errors.join(" "), /unexpected property "surprise"/);
+
+  const legacy = structuredClone(PLAN);
+  legacy.nodes[1].command = "true";
+  assert.match(validate(schema, legacy).errors.join(" "), /expected object, got string/);
 });
 
 test("waves order nodes by dependency and detect cycles", () => {
@@ -82,16 +86,17 @@ test("checkGate reads the filesystem, not claims", async () => {
 
   await writeFile(join(root, "docs", "01-product.md"), "x".repeat(500));
   await writeFile(
-    join(root, "json", "ui-layout.json"),
+    join(root, "json", "user-story.json"),
     JSON.stringify({
-      meta: { slug: "demo", intent: "demo" },
+      meta: { slug: "demo", intent: "demo", surface: "ui" },
+      mermaid: "flowchart TD\n  start[Open] --> done[Done]",
       screens: [{ id: "u1", name: "Home", purpose: "land", elements: [{ type: "heading", label: "Hi" }] }],
     }),
   );
   const good = await checkGate(root, "product");
   assert.equal(good.ok, true);
 
-  await writeFile(join(root, "json", "ui-layout.json"), "{not json");
+  await writeFile(join(root, "json", "user-story.json"), "{not json");
   const broken = await checkGate(root, "product");
   assert.equal(broken.ok, false);
   assert.match(broken.checks[1].detail, /invalid JSON/);

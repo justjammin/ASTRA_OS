@@ -15,20 +15,20 @@ The premise, started from a journey into harness orchestration, graph engineerin
 ## Install
 
 ```bash
-npx @ninjamin/astra-os          # copies the astra + grunt skills into ~/.claude/skills and ~/.codex/skills, builds the role map
+npx @ninjamin/astra-os          # installs the stella + grunt + mermaid + open-pencil skills for detected hosts, registers Astra MCP, builds the role map
 npm i -g @ninjamin/astra-os     # or install the astra CLI globally (preferred)
 ```
 
 Also installable as a plugin: `.claude-plugin/`, `.codex-plugin/`, and `plugin.source.json` ship in the package, with `skills/`, `commands/`, and `agents/` wired up.
 
-Claude Code, Factory Droid, and Codex can also drive Astra through its MCP bridge. Install the package globally so `astra-mcp` is on `PATH`, then use the bundled `.claude-plugin/.mcp.json`, `.factory-plugin/mcp.json`, or `.codex/config.toml` example. The same operations are available everywhere: start, status, run, approve, respond, complete, and session. See `docs/harnesses/mcp.md`.
+Claude Code, Factory Droid, and Codex can also drive Astra through its MCP bridge. Installing the package runs a safe postinstall: detected hosts receive the Stella, Grunt, Mermaid, and OpenPencil skills, and the Astra MCP server is registered with the host's official interface when available. Existing MCP conflicts are preserved with a warning; missing hosts are skipped. See `docs/harnesses/mcp.md`.
 
 ## Quickstart
 
 ```bash
 astra doctor                                    # which agent CLIs are on PATH
 astra start "add usage-based billing" --agent pi --judge magi --budget-tokens 200000
-astra run                                       # Gate 1: product intent + UI mockups
+astra run                                       # Gate 1: product intent + User Story
 astra session                                   # harness route, workers, token calculations
 astra viz                                       # open the retro review console
 astra approve product && astra advance          # human clears the gate
@@ -39,7 +39,7 @@ astra run                                       # Gate 2 …
 
 | # | Gate | Role | Artifacts |
 |---|---|---|---|
-| 1 | Product Intent & Visual Spec | Product Architect | `docs/01-product.md`, `json/ui-layout.json` |
+| 1 | Product Intent & User Story | Product Architect | `docs/01-product.md`, `json/user-story.json` |
 | 2 | Architecture & Adversarial Audit | System Designer + grunt / MAGI | `docs/02-architecture.md`, `json/system-architecture.json`, `json/audit.json` |
 | 3 | Program Design & Contract Hardening | Program Designer | `docs/03-program-design.md`, `json/call-stack-types.json` |
 | 4 | Graph Engineering & Role Allocation | Graph Engineer | `docs/04-slices.md`, `PLAN.md`, `json/plan.json` |
@@ -47,7 +47,7 @@ astra run                                       # Gate 2 …
 
 Everything lands under `.astra/<slug>/`. The ledger is `status.json`; its human mirror is `00-status.md`.
 
-**Gate 1** bans technical jargon outright — no frameworks, endpoints, schemas, or file paths in prose. It emits `ui-layout.json`, which the visualizer renders as real HTML sandbox mockups so a non-technical stakeholder can validate intent before any architecture exists.
+**Gate 1** bans technical jargon outright — no frameworks, endpoints, schemas, or file paths in prose. It emits `user-story.json` with a Mermaid.js interaction flow for every story. Stories containing a graphical component additionally produce an editable OpenPencil `.fig` design and PNG preview; non-UI stories stay flow-only. The visualizer renders the flow locally and opens UI previews in the same pop-out document viewer.
 
 **Gate 2** designs service fit, interfaces, data model, and sequence flows including failure paths, then hands the design to an adversarial reviewer before any human reads it. `--judge solo` runs one skeptic; `--judge magi` runs Melchior, Balthasar, and Casper independently. Personas each write one findings file; the harness merges them arithmetically, so an unresolved `P0` rejects the gate no matter what the personas declared. Findings land in `system-architecture.json` as `riskFlags`, rendered beside the flow they attack.
 
@@ -129,16 +129,15 @@ GitHub Actions deploys the site from `main` when `site/` or its Wrangler config 
 
 ## Releases
 
-The package is currently version `0.2.0`. A semantic version tag packages the tested npm artifact and attaches that same tarball to a GitHub release. Publish npm locally when you are ready:
+The package is currently version `0.2.2`. A matching semantic version tag runs two release workflows: one packages the tested artifact and creates the GitHub release, while the other publishes the same package version to npm with provenance through trusted publishing.
 
 ```bash
 npm test
-npm publish --access public
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.2.2
+git push origin v0.2.2
 ```
 
-The GitHub workflow does not publish npm. It only verifies, packages, and creates the GitHub release; it refuses tags that do not match `package.json`.
+Configure npm trusted publishing for repository `justjammin/ASTRA_OS`, workflow `npm-publish.yml`, and environment `npm-release`. Both workflows refuse tags that do not match `package.json`; npm publishing uses short-lived GitHub OIDC credentials instead of a stored npm token.
 
 ## Commands and exit codes
 
@@ -172,7 +171,7 @@ npm test          # node --test, zero dependencies
 node visualizer/server.mjs .astra/<slug>
 ```
 
-Node >= 22.19, ESM throughout. Pi and runtime-schema support ship as dependencies; LangGraph.js remains an optional peer. Schemas in `lib/schemas/` are the artifact contract; the validator in `lib/validate.mjs` implements the subset they use.
+Node >= 22.19, ESM throughout. Pi, Mermaid.js (`11.17.2`), OpenPencil CLI (`0.14.0`), and runtime-schema support ship as dependencies; LangGraph.js remains an optional peer. Schemas in `lib/schemas/` are the artifact contract; the validator in `lib/validate.mjs` implements the subset they use.
 
 ## License
 

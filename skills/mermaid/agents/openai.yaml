@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mermaid User Flows"
+  short_description: "Diagram user interactions as Mermaid flows"
+  default_prompt: "Use $mermaid to document this user interaction flow."

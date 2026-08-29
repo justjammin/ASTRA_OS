@@ -30,14 +30,19 @@ async function writeProductArtifacts(root) {
   await mkdir(join(root, "json"), { recursive: true });
   await writeFile(join(root, "docs", "01-product.md"), `# Thing\n${"detail ".repeat(120)}`);
   await writeFile(
-    join(root, "json", "ui-layout.json"),
+    join(root, "json", "user-story.json"),
     JSON.stringify({
-      meta: { slug: "add-a-widget", intent: "add a widget" },
+      meta: { slug: "add-a-widget", intent: "add a widget", surface: "ui" },
+      mermaid: "flowchart TD\n  start[Open widgets] --> list[See widgets]",
       screens: [
         { id: "u1", name: "Widget list", purpose: "see widgets", elements: [{ type: "table", label: "Widgets" }], acceptance: ["lists widgets"] },
       ],
     }),
   );
+  await mkdir(join(root, "designs"), { recursive: true });
+  await mkdir(join(root, "assets"), { recursive: true });
+  await writeFile(join(root, "designs", "user-story.fig"), Buffer.from("504b0506000000000000000000000000000000000000", "hex"));
+  await writeFile(join(root, "assets", "user-story.png"), Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", "base64"));
 }
 
 test("--help exits clean and lists the gates", async () => {
@@ -70,7 +75,7 @@ test("start writes the ledger, then gate/approve/advance walk the phases", async
   assert.equal(session.harness, "claude");
   assert.equal(session.interface, "tui");
   assert.equal(session.budget.budgetTokens, 50000);
-  assert.match(await readFile(join(root, "00-status.md"), "utf8"), /Product Intent & Visual Spec/);
+  assert.match(await readFile(join(root, "00-status.md"), "utf8"), /Product Intent & User Story/);
 
   const second = await astra(["start", "another idea"], { cwd: dir, env });
   assert.equal(second.code, 3, "a second run cannot start while one is active");

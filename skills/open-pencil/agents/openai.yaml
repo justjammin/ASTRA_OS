@@ -1,0 +1,4 @@
+interface:
+  display_name: "Astra OpenPencil"
+  short_description: "Inspect Astra UI story .fig artifacts"
+  default_prompt: "Use $open-pencil to inspect this Astra UI story design artifact."

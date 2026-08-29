@@ -1,14 +1,16 @@
 import { createServer } from "node:http";
-import { watch } from "node:fs";
+import { existsSync, watch } from "node:fs";
 import {
   mkdir,
   open,
   readFile,
   readdir,
+  realpath,
   stat,
   writeFile,
 } from "node:fs/promises";
 import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,14 +18,42 @@ import { GATES, GATE_IDS } from "../lib/gates.mjs";
 import { REL } from "../lib/paths.mjs";
 import { readInteraction, respondInteraction } from "../lib/policy.mjs";
 import { parseRuntime, FeedbackBody } from "../lib/schemas/runtime.mjs";
+import { inspectWireDsl } from "../lib/wire-dsl.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(HERE, "..");
 const TEMPLATE_ROOT = join(HERE, "template");
 const ASSET_ROOT = join(PROJECT_ROOT, "assets");
+const require = createRequire(import.meta.url);
+
+function resolveMermaidModule() {
+  const candidates = ["mermaid/dist/mermaid.esm.min.mjs"];
+  try {
+    const packageEntry = require.resolve("mermaid");
+    const packageDist = dirname(packageEntry);
+    candidates.push(join(packageDist, "mermaid.esm.min.mjs"), join(packageDist, "mermaid.esm.mjs"));
+  } catch {
+    // Mermaid is installed with the published package; source checkouts may not have dependencies.
+  }
+  for (const candidate of candidates) {
+    try {
+      const resolved = candidate.startsWith("mermaid/") ? require.resolve(candidate) : candidate;
+      if (existsSync(resolved)) return resolved;
+    } catch {
+      // Try the next published entrypoint.
+    }
+  }
+  return null;
+}
+
+const MERMAID_MODULE_PATH = resolveMermaidModule();
+const MERMAID_DIST_ROOT = MERMAID_MODULE_PATH ? dirname(MERMAID_MODULE_PATH) : null;
+const MERMAID_ROUTE_PREFIX = "/vendor/mermaid/";
 
 const ARTIFACT_PATHS = {
   uiLayout: REL.uiLayout,
+  // Keep fallbacks while older callers load a paths module without the User Story additions.
+  userStory: REL.userStory ?? "json/user-story.json",
   systemArchitecture: REL.systemArchitecture,
   callStackTypes: REL.callStackTypes,
   plan: REL.dag,
@@ -47,6 +77,16 @@ const STATIC_FILES = {
   "/assets/astra-os.svg": { path: join(ASSET_ROOT, "astra-os.svg"), type: "image/svg+xml" },
   "/assets/astra-os-mark.svg": { path: join(ASSET_ROOT, "astra-os-mark.svg"), type: "image/svg+xml" },
 };
+
+const USER_STORY_BINARY_PATHS = {
+  userStoryPreview: REL.userStoryPreview ?? "assets/user-story.png",
+  userStoryDesign: REL.userStoryFig ?? REL.userStoryDesign ?? "designs/user-story.fig",
+};
+
+const USER_STORY_BINARY_ROUTES = new Map([
+  ["/api/artifacts/user-story/preview", { key: "userStoryPreview", type: "image/png", disposition: "inline", filename: "user-story.png" }],
+  ["/api/artifacts/user-story/design", { key: "userStoryDesign", type: "application/octet-stream", disposition: "attachment", filename: "user-story.fig" }],
+]);
 
 const VALID_STATUSES = new Set(["pending", "ran", "cleared", "failed"]);
 const VALID_VERDICTS = new Set(["approved", "changes-requested"]);
@@ -96,11 +136,53 @@ async function fileStat(root, relPath) {
   }
 }
 
-async function readArtifact(root, relPath) {
-  const info = await fileStat(root, relPath);
+function pathInside(root, candidate) {
+  const relativePath = relative(root, candidate);
+  return relativePath === "" || (relativePath !== ".." && !relativePath.startsWith(`..${sep}`) && !relativePath.startsWith(sep));
+}
+
+/** Resolve a run artifact without following a symlink outside the run root. */
+async function secureRunPath(root, relPath) {
+  let realRoot;
+  const lexical = resolve(root, relPath);
+  try {
+    realRoot = await realpath(root);
+  } catch {
+    return null;
+  }
+  if (!pathInside(resolve(root), lexical)) return null;
+
+  try {
+    const target = await realpath(lexical);
+    return pathInside(realRoot, target) ? { path: lexical, exists: true } : null;
+  } catch {
+    // Missing files remain missing, but a symlinked parent must still be rejected.
+    try {
+      const parent = await realpath(dirname(lexical));
+      return pathInside(realRoot, parent) ? { path: lexical, exists: false } : null;
+    } catch {
+      return null;
+    }
+  }
+}
+
+async function secureFileStat(root, relPath) {
+  const safe = await secureRunPath(root, relPath);
+  if (!safe?.exists) return null;
+  try {
+    const info = await stat(safe.path);
+    return info.isFile() ? info : null;
+  } catch {
+    return null;
+  }
+}
+
+async function readArtifact(root, relPath, { secure = false } = {}) {
+  const info = secure ? await secureFileStat(root, relPath) : await fileStat(root, relPath);
   if (!info) return null;
   try {
-    return JSON.parse(await readText(join(root, relPath)));
+    const path = secure ? (await secureRunPath(root, relPath))?.path : join(root, relPath);
+    return path ? JSON.parse(await readText(path)) : null;
   } catch {
     return null;
   }
@@ -115,6 +197,19 @@ async function readDoc(root, relPath) {
   } catch {
     return null;
   }
+}
+
+async function readBinaryMetadata(root, relPath, { type, url, downloadUrl } = {}) {
+  const info = await secureFileStat(root, relPath);
+  if (!info) return null;
+  return {
+    path: relPath,
+    bytes: info.size,
+    updatedAt: new Date(info.mtimeMs).toISOString(),
+    ...(type ? { type } : {}),
+    ...(url ? { url } : {}),
+    ...(downloadUrl ? { downloadUrl } : {}),
+  };
 }
 
 async function collectMtimes(root, current = {}, prefix = "") {
@@ -230,7 +325,22 @@ export async function aggregateState(runRoot) {
   const session = await readArtifact(root, REL.session);
   const artifacts = {};
   for (const [key, relPath] of Object.entries(ARTIFACT_PATHS)) {
-    artifacts[key] = await readArtifact(root, relPath);
+    artifacts[key] = await readArtifact(root, relPath, { secure: key === "userStory" });
+  }
+  if (artifacts.userStory?.meta?.surface === "ui") {
+    artifacts.userStoryPreview = await readBinaryMetadata(root, USER_STORY_BINARY_PATHS.userStoryPreview, {
+      type: "image/png",
+      url: "/api/artifacts/user-story/preview",
+      downloadUrl: "/api/artifacts/user-story/preview?download=1",
+    });
+    artifacts.userStoryDesign = await readBinaryMetadata(root, USER_STORY_BINARY_PATHS.userStoryDesign, {
+      type: "application/octet-stream",
+      url: "/api/artifacts/user-story/design",
+      downloadUrl: "/api/artifacts/user-story/design",
+    });
+  } else {
+    artifacts.userStoryPreview = null;
+    artifacts.userStoryDesign = null;
   }
 
   const docs = {};
@@ -252,12 +362,23 @@ export async function aggregateState(runRoot) {
     session,
     gates,
     artifacts,
+    wireframes: wireframeState(artifacts.uiLayout),
     docs,
     markdown: await collectMarkdown(root),
     logFeed: await readLogFeed(root),
     interaction: await readInteraction(root),
     mtimeMs: await collectMtimes(root),
   };
+}
+
+function wireframeState(uiLayout) {
+  if (typeof uiLayout?.wireDsl !== "string") {
+    return { ok: false, legacy: true, error: "Wire DSL source is not present", project: null };
+  }
+  const inspected = inspectWireDsl(uiLayout.wireDsl);
+  return inspected.ok
+    ? { ok: true, legacy: false, error: null, project: inspected.project }
+    : { ok: false, legacy: false, error: inspected.error, project: null };
 }
 
 function decodedPath(reqUrl) {
@@ -298,7 +419,29 @@ function validateFeedback(body) {
   return parsed.ok ? null : parsed.errors.join("; ");
 }
 
+function requestHasJsonContentType(req) {
+  return String(req.headers["content-type"] ?? "").split(";", 1)[0].trim().toLowerCase() === "application/json";
+}
+
+function requestHasSameOrigin(req) {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  try {
+    return new URL(origin).origin === `http://${req.headers.host}`;
+  } catch {
+    return false;
+  }
+}
+
 async function handleFeedback(req, res, runRoot) {
+  if (!requestHasJsonContentType(req)) {
+    errorResponse(res, 415, "unsupported_media_type", "feedback requests must use application/json");
+    return;
+  }
+  if (!requestHasSameOrigin(req)) {
+    errorResponse(res, 403, "forbidden_origin", "feedback requests must be same-origin");
+    return;
+  }
   let body;
   try {
     body = JSON.parse(await readBody(req));
@@ -315,8 +458,9 @@ async function handleFeedback(req, res, runRoot) {
 
   const relativePath = `json/feedback-${body.gate}.json`;
   const target = resolve(runRoot, relativePath);
-  const targetRelative = relative(resolve(runRoot), target);
-  if (targetRelative === ".." || targetRelative.startsWith(`..${sep}`)) {
+  await mkdir(dirname(target), { recursive: true });
+  const safeTarget = await secureRunPath(runRoot, relativePath);
+  if (!safeTarget) {
     errorResponse(res, 400, "invalid_path", "feedback path is outside run root");
     return;
   }
@@ -328,8 +472,7 @@ async function handleFeedback(req, res, runRoot) {
     findings: body.findings ?? [],
     receivedAt: new Date().toISOString(),
   };
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, `${JSON.stringify(feedback, null, 2)}\n`, "utf8");
+  await writeFile(safeTarget.path, `${JSON.stringify(feedback, null, 2)}\n`, "utf8");
   jsonResponse(res, 200, { ok: true, path: target });
 }
 
@@ -353,12 +496,113 @@ function staticFile(pathname) {
   return STATIC_FILES[pathname] ?? null;
 }
 
+function mermaidAssetType(pathname) {
+  if (pathname.endsWith(".css")) return "text/css";
+  if (pathname.endsWith(".json")) return "application/json";
+  if (pathname.endsWith(".map")) return "application/json";
+  if (pathname.endsWith(".wasm")) return "application/wasm";
+  if (pathname.endsWith(".mjs") || pathname.endsWith(".js")) return "text/javascript";
+  return "application/octet-stream";
+}
+
+async function handleMermaidAsset(req, res, pathname) {
+  if (req.method !== "GET") {
+    errorResponse(res, 405, "method_not_allowed", "GET required");
+    return;
+  }
+  if (!MERMAID_DIST_ROOT) {
+    errorResponse(res, 404, "not_found", "Mermaid module is not installed");
+    return;
+  }
+
+  const requested = pathname.slice(MERMAID_ROUTE_PREFIX.length);
+  if (!requested || requested.split("/").some((part) => !part || part === "." || part === "..")) {
+    errorResponse(res, 400, "invalid_path", "invalid Mermaid asset path");
+    return;
+  }
+  const target = resolve(MERMAID_DIST_ROOT, requested);
+  const targetRelative = relative(MERMAID_DIST_ROOT, target);
+  if (targetRelative === ".." || targetRelative.startsWith(`..${sep}`) || targetRelative.includes(`..${sep}`)) {
+    errorResponse(res, 400, "invalid_path", "Mermaid asset path is outside the bundled module");
+    return;
+  }
+
+  const info = await fileStat(MERMAID_DIST_ROOT, targetRelative);
+  if (!info) {
+    errorResponse(res, 404, "not_found", "Mermaid asset not found");
+    return;
+  }
+  try {
+    const body = await readFile(target);
+    res.writeHead(200, {
+      "content-type": `${mermaidAssetType(requested)}; charset=utf-8`,
+      "cache-control": "no-store",
+      "content-length": body.byteLength,
+      "x-content-type-options": "nosniff",
+    });
+    res.end(body);
+  } catch {
+    errorResponse(res, 404, "not_found", "Mermaid asset not found");
+  }
+}
+
+async function handleUserStoryBinary(req, res, runRoot, route, requestUrl) {
+  if (req.method !== "GET") {
+    errorResponse(res, 405, "method_not_allowed", "GET required");
+    return;
+  }
+
+  const story = await readArtifact(runRoot, ARTIFACT_PATHS.userStory, { secure: true });
+  if (story?.meta?.surface !== "ui") {
+    errorResponse(res, 404, "not_found", "User Story artifact is not available");
+    return;
+  }
+  const relPath = USER_STORY_BINARY_PATHS[route.key];
+  const safePath = await secureRunPath(runRoot, relPath);
+  const info = await secureFileStat(runRoot, relPath);
+  if (!info) {
+    errorResponse(res, 404, "not_found", "User Story artifact is not available");
+    return;
+  }
+
+  let body;
+  try {
+    body = await readFile(safePath.path);
+  } catch {
+    errorResponse(res, 404, "not_found", "User Story artifact is not available");
+    return;
+  }
+
+  const query = new URL(requestUrl ?? "/", "http://astra.local").searchParams;
+  const download = route.disposition === "attachment" || query.get("download") === "1";
+  const headers = {
+    "content-type": route.type,
+    "cache-control": "no-store",
+    "content-length": body.byteLength,
+    "content-disposition": `${download ? "attachment" : "inline"}; filename="${route.filename}"`,
+    "x-content-type-options": "nosniff",
+  };
+  res.writeHead(200, headers);
+  res.end(body);
+}
+
 async function handleRequest(req, res, runRoot, streamClients) {
   let pathname;
   try {
     pathname = decodedPath(req.url);
   } catch (error) {
     errorResponse(res, 400, "invalid_path", error.message);
+    return;
+  }
+
+  if (pathname.startsWith(MERMAID_ROUTE_PREFIX)) {
+    await handleMermaidAsset(req, res, pathname);
+    return;
+  }
+
+  const userStoryBinaryRoute = USER_STORY_BINARY_ROUTES.get(pathname);
+  if (userStoryBinaryRoute) {
+    await handleUserStoryBinary(req, res, runRoot, userStoryBinaryRoute, req.url);
     return;
   }
 

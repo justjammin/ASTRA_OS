@@ -2,11 +2,16 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "astra-os/ui-layout.schema.json",
   "title": "Astra Gate 1 — UI Layout",
-  "description": "Structured visual intent emitted with 01-product.md. The visualizer renders each screen as a plain HTML sandbox mockup so a non-technical human can validate intent before any architecture exists.",
+  "description": "Structured visual intent emitted with 01-product.md. Wire DSL supplies the visual source; screens, flows, and acceptance keep the stakeholder contract explicit.",
   "type": "object",
-  "required": ["meta", "screens"],
+  "required": ["meta", "screens", "wireDsl"],
   "additionalProperties": false,
   "properties": {
+    "wireDsl": {
+      "type": "string",
+      "minLength": 40,
+      "description": "Wire DSL-compatible source. Each screens[].id must appear as one screen identifier."
+    },
     "meta": {
       "type": "object",
       "required": ["slug", "intent"],

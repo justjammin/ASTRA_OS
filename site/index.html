@@ -220,7 +220,7 @@
               <div class="console-runline"><span class="prompt">$</span> astra start <span class="command-string">"make billing observable"</span></div>
               <div class="console-status"><span class="status-dot" aria-hidden="true"></span><span>GATE RAIL / HANDSHAKE READY</span></div>
               <ol class="console-rail">
-                <li class="is-ready"><span>01</span><strong>PRODUCT INTENT</strong><small>UI LAYOUT / READY</small></li>
+                <li class="is-ready"><span>01</span><strong>PRODUCT INTENT</strong><small>USER STORY / READY</small></li>
                 <li><span>02</span><strong>ARCHITECTURE</strong><small>SERVICE FIT / QUEUED</small></li>
                 <li><span>03</span><strong>PROGRAM DESIGN</strong><small>CONTRACTS / QUEUED</small></li>
                 <li><span>04</span><strong>GRAPH ENGINEERING</strong><small>DAG / QUEUED</small></li>
@@ -248,9 +248,9 @@
               <div class="gate-index">01</div>
               <div class="gate-main">
                 <p class="eyebrow gate-label">PRODUCT ARCHITECT / GATE ONE</p>
-                <h3>Product intent <span>&amp;</span> visual spec</h3>
-                <p>Translate a human change request into the product intent and UI layout that everyone can validate before architecture exists.</p>
-                <div class="artifact-row"><span class="artifact-chip artifact-chip--hot">DOC</span><code>docs/01-product.md</code><span class="artifact-arrow" aria-hidden="true">→</span><code>json/ui-layout.json</code></div>
+                <h3>Product intent <span>&amp;</span> User Story</h3>
+                <p>Translate a human change request into product intent and a Mermaid interaction flow; graphical components also receive an OpenPencil UI design before architecture exists.</p>
+                <div class="artifact-row"><span class="artifact-chip artifact-chip--hot">DOC</span><code>docs/01-product.md</code><span class="artifact-arrow" aria-hidden="true">→</span><code>json/user-story.json</code></div>
               </div>
               <div class="gate-signal" aria-hidden="true"><span>01</span><i></i><b>INTENT</b></div>
             </li>
@@ -421,7 +421,7 @@
             <div class="terminal-body">
               <div class="terminal-line"><span class="prompt">$</span><code>astra doctor</code><span class="terminal-comment"># check available CLIs</span></div>
               <div class="terminal-line"><span class="prompt">$</span><code>astra start <em>"add usage-based billing"</em></code></div>
-              <div class="terminal-line terminal-line--dim"><span class="prompt">→</span><code>gate 01 / product intent + UI mockups</code></div>
+              <div class="terminal-line terminal-line--dim"><span class="prompt">→</span><code>gate 01 / product intent + User Story</code></div>
               <div class="terminal-line"><span class="prompt">$</span><code>astra run</code><span class="terminal-comment"># generate current artifact</span></div>
               <div class="terminal-line terminal-line--dim"><span class="prompt">→</span><code>human approval required</code></div>
               <div class="terminal-line"><span class="prompt">$</span><code>astra approve product &amp;&amp; astra advance</code></div>
@@ -440,7 +440,7 @@
             <details open><summary>Is ASTRA OS another coding agent?</summary><p>No. It is a portable harness around the coding agent you already use. ASTRA adds the gated process, artifact validation, bounded roles, and review surface.</p></details>
             <details><summary>Which agent CLIs can ASTRA drive?</summary><p>The bundled adapters cover Pi, Claude, Droid, OpenCode, Hermes, and Codex. Pi runs through its SDK; the other adapters spawn their installed CLIs.</p></details>
             <details><summary>What happens when a gate is not ready?</summary><p>ASTRA names the missing or invalid artifact, stops the transition, and leaves the run available for a bounded rework loop or a human decision.</p></details>
-            <details><summary>Can a non-technical stakeholder review the work?</summary><p>Yes. Gate 1 is written for product intent and visual validation, while the review console renders saved artifacts and document viewers for human inspection.</p></details>
+            <details><summary>Can a non-technical stakeholder review the work?</summary><p>Yes. Gate 1 includes a Mermaid interaction flow for every story, plus an OpenPencil UI design and PNG preview when a graphical component is present; the review console renders both in its document viewers.</p></details>
             <details><summary>Does ASTRA require LangGraph?</summary><p>No. The bundled local runtime is the default. LangGraph is an optional peer runtime with parity tests.</p></details>
           </div>
         </div>

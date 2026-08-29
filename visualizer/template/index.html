@@ -343,6 +343,28 @@
         padding-bottom: 12px;
         border-bottom: 1px solid var(--line);
       }
+      details.panel > summary.panel-heading {
+        min-height: 44px;
+        cursor: pointer;
+        list-style: none;
+      }
+      details.panel > summary.panel-heading::-webkit-details-marker { display: none; }
+      details.panel > summary.panel-heading::after {
+        order: 3;
+        width: 100%;
+        color: var(--faint);
+        font: .64rem/1 var(--mono);
+        letter-spacing: .12em;
+        content: "COLLAPSE  ▲";
+        text-align: right;
+      }
+      details.panel:not([open]) > summary.panel-heading {
+        margin-bottom: 0;
+        border-bottom-color: transparent;
+      }
+      details.panel:not([open]) > summary.panel-heading::after { content: "EXPAND  ▼"; }
+      details.panel:not([open])::after { display: none; }
+      .panel-content { min-width: 0; }
       .panel-heading h2 {
         margin: 0;
         color: var(--ink);
@@ -524,6 +546,120 @@
         font: .72rem/1 var(--mono);
         text-transform: uppercase;
       }
+      .wire-layout {
+        display: grid;
+        min-width: 0;
+        gap: 10px;
+      }
+      .wire-stack { grid-auto-flow: row; }
+      .wire-stack[data-direction="horizontal"] { grid-auto-flow: column; }
+      .wire-grid {
+        grid-template-columns: repeat(var(--wire-columns, 2), minmax(0, 1fr));
+      }
+      .wire-split { grid-template-columns: minmax(150px, .65fr) minmax(0, 1.35fr); }
+      .wire-panel, .wire-card, .wire-cell {
+        padding: 12px;
+        background: var(--surface-raised);
+        border: 2px solid var(--line-strong);
+      }
+      .wire-warning {
+        margin: 14px 0 0;
+        padding: 10px 12px;
+        color: var(--amber);
+        border: 1px solid var(--amber);
+        font: .72rem/1.45 var(--mono);
+      }
+      .user-story-content { display: grid; gap: 20px; }
+      .user-story-summary {
+        max-width: 78ch;
+        margin: 0;
+        padding: 13px 15px;
+        color: var(--ink);
+        background: color-mix(in oklch, var(--voting-blue) 8%, transparent);
+        border-left: 3px solid var(--voting-blue);
+      }
+      .story-block { display: grid; gap: 10px; min-width: 0; }
+      .mermaid-flow {
+        display: grid;
+        min-height: 180px;
+        align-items: center;
+        justify-items: center;
+        padding: 18px;
+        overflow: auto;
+        background: var(--surface-emphasis);
+        border: 2px solid var(--line-strong);
+      }
+      .mermaid-svg { width: 100%; min-width: min(560px, 100%); text-align: center; }
+      .mermaid-svg svg { display: inline-block; max-width: 100%; height: auto; }
+      .story-loading, .story-error { margin: 0; color: var(--muted); font: .72rem/1.45 var(--mono); }
+      .story-error { color: var(--amber); }
+      .story-source { border: 1px solid var(--line); background: color-mix(in oklch, var(--charred) 42%, transparent); }
+      .story-source-heading {
+        padding: 10px 12px;
+        color: var(--cyan-soft);
+        cursor: pointer;
+        font: .68rem/1 var(--mono);
+        letter-spacing: .12em;
+      }
+      .story-source .mermaid-source { margin: 0 12px 12px; }
+      .mermaid-source {
+        max-height: 240px;
+        padding: 12px;
+        overflow: auto;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        background: var(--charred);
+        color: var(--lime);
+        border: 1px solid var(--line);
+        font: .72rem/1.45 var(--mono);
+      }
+      .story-preview-trigger {
+        position: relative;
+        display: grid;
+        width: 100%;
+        min-height: 180px;
+        padding: 12px;
+        overflow: hidden;
+        background: var(--surface-emphasis);
+        border: 2px solid var(--line-strong);
+        color: var(--ink);
+        text-align: left;
+      }
+      .story-preview-trigger:hover, .story-preview-trigger:focus-visible { border-color: var(--lime); }
+      .story-preview-image {
+        display: block;
+        width: 100%;
+        max-height: 360px;
+        object-fit: contain;
+        background: var(--surface);
+      }
+      .story-preview-caption {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        padding: 6px 9px;
+        background: color-mix(in oklch, var(--charred) 88%, transparent);
+        border: 1px solid var(--lime);
+        color: var(--lime);
+        font: .66rem/1 var(--mono);
+        letter-spacing: .12em;
+      }
+      .artifact-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .artifact-download {
+        display: inline-block;
+        min-height: 34px;
+        padding: 9px 11px;
+        color: var(--cyan-soft);
+        border: 1px solid var(--line-strong);
+        font: .66rem/1 var(--mono);
+        letter-spacing: .08em;
+        text-decoration: none;
+      }
+      .artifact-download:hover, .artifact-download:focus-visible { color: var(--lime); border-color: var(--lime); }
+      .artifact-download.unavailable { color: var(--faint); border-style: dashed; }
+      .story-modal { display: grid; gap: 16px; }
+      .story-modal-figure { display: grid; gap: 8px; margin: 0; }
+      .story-modal-image { display: block; width: 100%; max-height: 68vh; object-fit: contain; background: var(--surface); border: 1px solid var(--line); }
       .screen-aside { display: grid; align-content: start; gap: 14px; }
       .aside-block { padding-top: 10px; border-top: 1px solid var(--line); }
       .aside-block:first-child { padding-top: 0; border-top: 0; }
@@ -910,7 +1046,7 @@
     </header>
     <main id="console" class="console"></main>
     <footer id="review-footer" class="review-footer"></footer>
-    <dialog id="doc-modal" class="doc-modal" aria-label="Document viewer">
+    <dialog id="doc-modal" class="doc-modal" aria-labelledby="doc-modal-title" aria-describedby="doc-modal-meta">
       <header class="doc-modal-head">
         <div>
           <h2 id="doc-modal-title" class="doc-modal-title">DOCUMENT</h2>

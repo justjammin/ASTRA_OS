@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "astra-os/user-story.schema.json",
+  "title": "Astra Gate 1 — User Story",
+  "description": "A Mermaid interaction flow and, for graphical products, a structured map of the states that OpenPencil renders.",
+  "type": "object",
+  "required": ["meta", "mermaid"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["slug", "intent", "surface"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "intent": { "type": "string", "minLength": 1 },
+        "surface": { "type": "string", "enum": ["ui", "non-ui"] },
+        "generatedBy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "mermaid": {
+      "type": "string",
+      "minLength": 20,
+      "description": "A Mermaid flowchart source beginning with flowchart or graph and describing the user interaction."
+    },
+    "screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "purpose", "elements"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^u[0-9]+$" },
+          "name": { "type": "string", "minLength": 1 },
+          "purpose": { "type": "string", "minLength": 1 },
+          "elements": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["type", "label"],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "heading",
+                    "text",
+                    "button",
+                    "input",
+                    "select",
+                    "checkbox",
+                    "table",
+                    "list",
+                    "card",
+                    "image",
+                    "nav",
+                    "form",
+                    "chart",
+                    "badge",
+                    "modal",
+                    "terminal"
+                  ]
+                },
+                "label": { "type": "string", "minLength": 1 },
+                "notes": { "type": "string" }
+              }
+            }
+          },
+          "acceptance": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

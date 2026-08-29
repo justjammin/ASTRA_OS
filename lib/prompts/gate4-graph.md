@@ -33,7 +33,7 @@ JSON validating against this schema:
   - `e2e` — one traced end-to-end request path per slice, no more.
 - Every slice ends with verification nodes. A slice whose last node is `implement` is invalid.
 - `deps` must form a DAG with no cycles and reference existing node ids only. Independent nodes get `parallel: true`.
-- Each verification node whose check is mechanical carries a `command` (the repository's real command, e.g. `npm run lint`, `pytest tests/unit -q`). Nodes with a `command` run it directly; nodes without one invoke the agent.
+- Each verification node whose check is mechanical carries a structured `command` object with the exact executable and argv, for example `{ "program": "npm", "args": ["run", "lint"] }` or `{ "program": "pytest", "args": ["tests/unit", "-q"] }`. Commands run with no shell: do not use pipes, redirects, substitutions, chaining, globbing, or shell metacharacters. Nodes with a `command` run it directly; nodes without one invoke the agent. Never emit legacy string commands; regenerate or migrate any plan that contains one.
 - `role.systemPrompt` is a scoped operating brief for that node: what it owns, the contract signatures it must honour verbatim, what it must not touch. 80 words maximum.
 - `role.writeBoundary` lists only paths present in `{{CALL_STACK_TYPES_PATH}}` (test paths included). No globs wider than a single directory.
 - `role.inputs` / `role.outputs` name the artifacts or files crossing the node boundary.
