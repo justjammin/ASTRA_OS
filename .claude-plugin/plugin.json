@@ -1,6 +1,6 @@
 {
   "name": "astra-os",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Front-loaded software factory harness. Drives one headless coding CLI (claude, droid, opencode, hermes, codex) through five gated phases — product intent with Mermaid flows and optional OpenPencil UI stories, architecture with adversarial audit, program design contracts, DAG planning with scoped agent roles, and Testing Trophy execution streamed to a retro visualizer.",
   "skills": "./skills/",
   "commands": "./commands/",

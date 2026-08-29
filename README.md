@@ -129,12 +129,12 @@ GitHub Actions deploys the site from `main` when `site/` or its Wrangler config 
 
 ## Releases
 
-The package is currently version `0.2.2`. A matching semantic version tag runs two release workflows: one packages the tested artifact and creates the GitHub release, while the other publishes the same package version to npm with provenance through trusted publishing.
+The package is currently version `0.2.3`. A matching semantic version tag runs two release workflows: one packages the tested artifact and creates the GitHub release, while the other publishes the same package version to npm with provenance through trusted publishing.
 
 ```bash
 npm test
-git tag v0.2.2
-git push origin v0.2.2
+git tag v0.2.3
+git push origin v0.2.3
 ```
 
 Configure npm trusted publishing for repository `justjammin/ASTRA_OS`, workflow `npm-publish.yml`, and environment `npm-release`. Both workflows refuse tags that do not match `package.json`; npm publishing uses short-lived GitHub OIDC credentials instead of a stored npm token.

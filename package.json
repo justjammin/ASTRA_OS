@@ -1,6 +1,6 @@
 {
   "name": "@ninjamin/astra-os",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "description": "Astra OS — a portable agent harness that drives one coding agent (Pi SDK or claude, droid, opencode, hermes, codex) through five front-loaded software-factory gates: product intent, architecture with adversarial audit, program design contracts, DAG planning with scoped agent roles, and testing-trophy execution streamed to a retro visualizer.",
   "bin": {

@@ -1,6 +1,6 @@
 {
   "name": "astra-os-factory",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Astra's five-gate software factory with Mermaid interaction flows, optional OpenPencil UI stories, and a local MCP control surface.",
   "skills": "./skills/",
   "commands": "./commands/",
