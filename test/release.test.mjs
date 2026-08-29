@@ -11,6 +11,7 @@ test("package and lockfile versions stay synchronized", async () => {
   const lockfile = JSON.parse(await readFile(join(ROOT, "package-lock.json"), "utf8"));
   assert.equal(lockfile.version, packageJson.version);
   assert.equal(lockfile.packages[""].version, packageJson.version);
+  assert.equal(packageJson.repository?.url, "https://github.com/justjammin/ASTRA_OS");
 });
 
 test("release workflow is tag-gated and publishes the packed artifact", async () => {

@@ -1,8 +1,16 @@
 {
   "name": "@ninjamin/astra-os",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "type": "module",
   "description": "Astra OS — a portable agent harness that drives one coding agent (Pi SDK or claude, droid, opencode, hermes, codex) through five front-loaded software-factory gates: product intent, architecture with adversarial audit, program design contracts, DAG planning with scoped agent roles, and testing-trophy execution streamed to a retro visualizer.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/justjammin/ASTRA_OS"
+  },
+  "homepage": "https://github.com/justjammin/ASTRA_OS#readme",
+  "bugs": {
+    "url": "https://github.com/justjammin/ASTRA_OS/issues"
+  },
   "bin": {
     "astra": "bin/astra.mjs",
     "astra-mcp": "lib/mcp-server.mjs"

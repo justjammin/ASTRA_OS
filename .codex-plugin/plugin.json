@@ -1,6 +1,6 @@
 {
   "name": "astra-os",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Front-loaded software factory harness. Drives one headless coding CLI through five gated phases with human approval between each, Mermaid interaction flows and optional OpenPencil UI stories, adversarial architecture audit, contract-scoped agent roles, and Testing Trophy execution streamed to a retro visualizer.",
   "skills": "./skills/",
   "commands": "./commands/",
