@@ -8,7 +8,7 @@ import { validate } from "../lib/validate.mjs";
 import { checkGate, findCycle, gateId, waves } from "../lib/gates.mjs";
 import { advance, emptyLedger, loop, markCleared, LOOP_BUDGET } from "../lib/ledger.mjs";
 import { resolve as resolveAudit } from "../lib/tribunal.mjs";
-import { outOfBounds, sliceOnly } from "../lib/pipeline.mjs";
+import { outOfBounds, sliceOnly, prepareGatePrompt } from "../lib/pipeline.mjs";
 import { classify, parseFrontmatter, scan } from "../lib/rolemap.mjs";
 import { loadSchema } from "../lib/prompt.mjs";
 import { runGraph } from "../lib/runtime/local.mjs";
@@ -64,6 +64,21 @@ test("validate enforces required keys, enums, and patterns", async () => {
   const legacy = structuredClone(PLAN);
   legacy.nodes[1].command = "true";
   assert.match(validate(schema, legacy).errors.join(" "), /expected object, got string/);
+});
+
+test("rendered gate schemas preserve the complete validator contract", async () => {
+  const root = await fixtureRoot();
+  const ctx = { cwd: root, root, slug: "demo", intent: "demo intent", agent: "codex" };
+  for (const [gate, schema] of [
+    ["product", "user-story"], ["architecture", "system-architecture"],
+    ["design", "call-stack-types"], ["plan", "plan"],
+  ]) {
+    const { prompt } = await prepareGatePrompt(ctx, gate);
+    const embedded = prompt.match(/```json\n([\s\S]*?)\n```/);
+    assert.ok(embedded, `${gate} must carry its schema in the worker prompt`);
+    assert.deepEqual(JSON.parse(embedded[1]), await loadSchema(schema));
+    assert.doesNotMatch(prompt, /\{\{[A-Z0-9_]+\}\}/);
+  }
 });
 
 test("waves order nodes by dependency and detect cycles", () => {

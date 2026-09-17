@@ -1,6 +1,6 @@
 # Stella and Astra token cost audit
 
-Measured 2026-09-17 UTC with `js-tiktoken` 1.0.21, encoding `o200k_base`, against this repository after narrowing the Protect port to OOP research and inline examples. Counts are exact for this encoding and fixture, not provider billing measurements. Other tokenizers differ.
+Measured 2026-09-17 UTC with `js-tiktoken` 1.0.21, encoding `o200k_base`, against this repository after the OOP-only Protect port and judge-approved schema compaction. See [the adversarial review](token-reduction-review.md) for proposal verdicts and remaining evidence gaps. Counts are exact for this encoding and fixture, not provider billing measurements. Other tokenizers differ.
 
 ## Entry instructions
 
@@ -22,20 +22,20 @@ Fixture: intent `Token audit fixture`, slug `token-audit`, agent `codex`, reposi
 
 | Packet | Prompt | Role | Combined |
 |---|---:|---:|---:|
-| Gate 1: product | 1,445 | 1,465 | 2,911 |
-| Gate 2: architecture | 2,151 | 1,213 | 3,365 |
-| Gate 3: contracts | 1,680 | 1,210 | 2,891 |
-| Gate 4: plan | 2,065 | 1,309 | 3,375 |
+| Gate 1: product | 1,151 | 1,465 | 2,617 |
+| Gate 2: architecture | 1,487 | 1,213 | 2,701 |
+| Gate 3: contracts | 1,194 | 1,210 | 2,405 |
+| Gate 4: plan | 1,541 | 1,309 | 2,851 |
 | Solo Grunt review | 633 | 1,103 | 1,737 |
 | MAGI Melchior review | 646 | 1,089 | 1,736 |
 | MAGI Balthasar review | 669 | 1,083 | 1,753 |
 | MAGI Casper review | 648 | 1,130 | 1,779 |
 
-Gates 1–4 plus solo review contribute **14,279 static instruction tokens** when each packet is sent once. Before this change: 14,119; added OOP example instructions: **160 tokens**. MAGI's three reviewer packets total 5,268, versus 1,737 for solo: an additional **3,531**, before the extra reviewers read the same design and produce findings. Solo remains the default.
+Gates 1–4 plus solo review contribute **12,311 static instruction tokens** when each packet is sent once. The OOP-only port measured 14,279; compact schemas remove **1,968 tokens (13.8%)**. The OOP examples remain unchanged. MAGI's three reviewer packets total 5,268, versus 1,737 for solo: an additional **3,531**, before the extra reviewers read the same design and produce findings. Solo remains the default.
 
 Gate 5 repeats a packet per DAG node. A tiny illustrative node measured approximately 1,427 tokens for implementation, 1,490 static verification, 1,439 unit, 1,523 integration, and 1,473 e2e. These use temporary fixture paths, one assertion, one write boundary and a short task. Real node contracts and tasks change the counts; these are not a per-node budget.
 
-Excluded: host/system instructions, skill discovery, conversation replay, repository/artifact reads, tool responses, external research, generated artifacts, reasoning, retries, the CLI's Gate 1 scout, and optional specialist overlays. Native worker context forwarding can repeat packets. Therefore 14,279 is an instruction contribution, not total run usage or a forecast.
+Excluded: host/system instructions, skill discovery, conversation replay, repository/artifact reads, tool responses, external research, generated artifacts, reasoning, retries, the CLI's Gate 1 scout, and optional specialist overlays. Native worker context forwarding can repeat packets. Therefore 12,311 is an instruction contribution, not total run usage or a forecast.
 
 ## Reference and transport costs
 
@@ -48,13 +48,13 @@ Excluded: host/system instructions, skill discovery, conversation replay, reposi
 
 ## Cost reductions, in priority order
 
-1. **Compact embedded JSON schemas.** `schemaText` currently pretty-prints them. Identical JSON semantics in compact form save **1,968 tokens** over Gates 1–4: product 294, architecture 664, contracts 486, plan 524. This is about 13.8% of the measured solo instruction contribution. Verify readability and artifact validity before shipping.
-2. **Return one schema representation in MCP packets.** Retain machine validation while avoiding the duplicate prompt/contracts representation. Potential saving: approximately **2,419 tokens** per four gate responses, with host serialization affecting exact results. Preserve MCP consumer compatibility; do not blindly remove structured results. This saving and schema compaction require a coordinated design to avoid double-counting overlapping changes.
-3. **Deduplicate role and task rules.** The five solo role blocks total **6,300 tokens**. Their operating rules, refusals and definitions of done repeat much of the gate prompt. A 50% role reduction would save about **3,150 tokens** per pass, but that is a target, not a verified safe edit. Keep write boundaries, evidence requirements, verdict discipline and acceptance checks explicit. Compare generated artifacts before/after.
+1. **Compact embedded JSON schemas — applied after adversarial review.** `schemaText` now emits compact JSON. Identical JSON semantics save **1,968 tokens** over Gates 1–4: product 294, architecture 664, contracts 486, plan 524. This is about 13.8% of the pre-compaction solo instruction contribution. Parsed equality and artifact handling are verified; live model readability/quality remains to be evaluated.
+2. **Return one schema representation in MCP packets — Investigate.** Retain machine validation while avoiding the duplicate prompt/contracts representation. Potential saving: approximately **2,419 tokens** per four gate responses, with host serialization affecting exact results. Preserve MCP consumer compatibility; do not blindly remove structured results. This saving and schema compaction require a coordinated design to avoid double-counting overlapping changes.
+3. **Deduplicate role and task rules — Investigate.** The five solo role blocks total **6,300 tokens**. Their operating rules, refusals and definitions of done repeat much of the gate prompt. A 50% role reduction would save about **3,150 tokens** per pass, but that is a target, not a verified safe edit. Keep write boundaries, evidence requirements, verdict discipline and acceptance checks explicit. Compare generated artifacts before/after.
 4. **Keep solo judging and conditional reference loading.** This already avoids the extra 3,531 static MAGI tokens and additional reviewer reads/outputs. Replace the historical coverage table with a small runtime routing index in a future change while retaining provenance separately. Do not preload the 10,193-token canonical catalog.
-5. **Bound context and reasoning by task.** `WORKER_MODELS` sets Codex/Droid workers to `gpt-5.6-luna` at `max` effort; the host-native path uses host dispatch settings. Trial lower effort for bounded verification tasks, keep stronger review where failures justify it, and measure quality alongside tokens. Reduce repeated artifact reads through scoped packets and reuse of unchanged evidence. Any saving here requires runtime measurements.
+5. **Bound context and reasoning by task — Investigate.** `WORKER_MODELS` sets Codex/Droid workers to `gpt-5.6-luna` at `max` effort; the host-native path uses host dispatch settings. Trial lower effort for bounded verification tasks, keep stronger review where failures justify it, and measure quality alongside tokens. Reduce repeated artifact reads through scoped packets and reuse of unchanged evidence. Any saving here requires runtime measurements.
 
-No cost optimization or model-default change was applied in this update; the requested Protect port added 160 static packet tokens and 221 Grunt entry tokens. The extended guidance stays separate and conditional.
+Only schema compaction has been applied. MCP representations, role instructions, and model defaults remain unchanged pending evidence. The extended OOP guidance stays separate and conditional; the original port added 160 static packet tokens and 221 Grunt entry tokens before this formatting reduction.
 
 ## Actual spend and reproducibility
 
