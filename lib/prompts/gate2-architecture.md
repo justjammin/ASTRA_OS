@@ -15,13 +15,13 @@ Markdown, in this exact section order:
 3. `## Interfaces` — every endpoint, queue topic, job, or CLI surface: signature, request shape, response shape, error cases, idempotency story.
 4. `## Data model` — entities, fields, types, ownership, and where they are stored. Name every migration required.
 5. `## Sequence flows` — the primary path plus every failure path, step by step, naming which component acts and whether the hop is sync or async.
-6. `## Patterns applied` — begin with the simplest sufficient design, including a direct function/module when adequate. For each serious candidate record observed pressure, simplest alternative, Apply/Reject/Investigate, benefit, cost, evidence, and revisit trigger. Include a requirement-to-design table: approved requirement ID (or exact acceptance criterion) → component → mechanism → verification evidence. Never force one pattern per requirement.
+6. `## Patterns applied` — which system-design patterns you used and why: idempotency keys, circuit breakers, retries with backoff, outbox, event decoupling, read models, bulkheads. For each pattern you deliberately did *not* apply, say what evidence would change that.
 7. `## Failure modes` — what breaks under load, partial failure, and duplicate delivery, and what the system does about it.
 8. `## Rejected alternatives` — at least two, each with the reason it lost.
 
 Constraints: no implementation bodies, no file-level design (that is Gate 3), no speculative future-proofing. Every claim about existing code carries a `path:line` anchor.
 
-For an observed object-design question, consult and cite relevant Refactoring.Guru pages beside decisions; map participants to actual components and acceptance/failure cases. Skip object-pattern research otherwise. Use appropriate primary sources for queues, replication, and deployment topology. State lifecycle transitions/invariants and state/side-effect ownership. Unresolved consequential decisions require evidence gathering or user input before dependent planning; reconcile changed requirements with approved intent.
+For an actual OOP design question, research only relevant candidates and explain the choice inside `## Patterns applied` with a short, original example adapted to this project. Show the simpler alternative, how the pattern changes behavior, and its tradeoff; use a concrete scenario or illustrative pseudocode, not file contracts or implementation bodies. The document must be self-contained: do not substitute external URLs for examples or send the reader to a pattern catalog. Skip this material when no OOP pressure exists.
 
 ## Deliverable 2 — `{{SYSTEM_ARCH_PATH}}`
 
@@ -35,7 +35,6 @@ Rules:
 - `services[].existing` is `true` only when you verified the component in the repository.
 - `sequences` must cover the primary path and at least one failure path.
 - `patterns[].status` records `selected` or `rejected`.
-- Keep Investigate candidates and their evidence-gathering actions in Markdown; do not label them selected in JSON.
 - Leave `riskFlags` empty; the adversarial judge pass fills it.
 - `meta.slug` must be exactly `{{SLUG}}`.
 

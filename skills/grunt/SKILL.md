@@ -7,7 +7,7 @@ description: Decide which architecture, backend, and API patterns to use — and
 
 Improve the outcome, not the argument. Make the strongest case for the proposal, then test it against code, runtime evidence, operational limits, and simpler alternatives.
 
-`grunt` is Astra OS's adversarial reviewer, adapted from promper's `sideeye` and redMage's Protect design discipline. It uses Astra's gates and artifacts; the pattern catalogs, judge protocol, and opt-in MAGI tribunal retain their existing contracts.
+`grunt` is Astra OS's adversarial reviewer. It is the same discipline promper ships as `sideeye`, wired to Astra's gates and artifacts: the pattern catalogs, judge protocol, and MAGI tribunal are carried over unchanged. OOP research guidance is adapted from redMage Protect.
 
 ## Mode
 
@@ -37,21 +37,17 @@ MAGI is opt-in and never auto-enabled. Astra may *recommend* it for P0 risk, irr
 ## Required workflow
 
 1. **Calibrate.** Name the artifact under review, the change's blast radius, and the reversibility. Record the fixed point (a commit for code review, an artifact path for design review). No fixed point, no review.
-2. **Route.** Read `references/coverage-index.md` with the judge protocol, then only the catalogs relevant to observed pressure. Classic software patterns: `references/architecture-resilience.md`, `references/data-messaging.md`, `references/object-design.md`, `references/observability-operations.md`, `references/infrastructure-delivery.md`. AI-agent / LLM patterns: `references/agentic-workflow.md`, `references/agentic-reasoning.md`, `references/agentic-coordination.md`, `references/agentic-control.md`, `references/agentic-knowledge.md`. `references/catalog.json` is the canonical id index.
+2. **Route.** Map the observed pressure to catalog domains. Classic software patterns: `references/architecture-resilience.md`, `references/data-messaging.md`, `references/object-design.md`, `references/observability-operations.md`, `references/infrastructure-delivery.md`. AI-agent / LLM patterns: `references/agentic-workflow.md`, `references/agentic-reasoning.md`, `references/agentic-coordination.md`, `references/agentic-control.md`, `references/agentic-knowledge.md`. `references/catalog.json` is the canonical id index; `references/coverage-index.md` says what is covered.
 3. **Judge.** Apply `references/judge-protocol.md`: decision standard, evidence ladder, grounding taxonomy (`claim` needs `file:line`, `citation` needs a primary URL, `guess` needs a promotion path and is always low confidence), the eight adversarial passes, and the `Apply` / `Reject` / `Investigate` verdict rule.
 4. **Report.** Write the artifact Astra expects for the gate you are serving (below). Every finding names the failure, the proof, the severity, and the smallest fix.
 
-## Design evidence
+## OOP research and inline examples
 
-Start with the simplest design satisfying the approved intent. A direct function or cohesive module is a valid choice; never force one pattern per requirement.
+For an actual object-design question, read [OOP design](references/oop-design.md), then only the relevant comparisons and examples in [pattern deep dives](references/pattern-deep-dives.md). Start with a direct function or cohesive module; add a pattern only for observed pressure. Skip this research when no OOP question exists.
 
-- Gate 2: check entities, state transitions/invariants, interfaces, storage, and request/data flow. Map approved requirement IDs (or exact acceptance criteria when IDs are absent) to components, mechanisms, and verification evidence.
-- Gate 3: check the proposed file tree with create/modify/existing markers and one responsibility per file. Check public symbols/signatures, input/output/error types, dependency direction, state and side-effect ownership, and test seams. Use typed skeletons only where they clarify contracts; avoid speculative scaffolding and unrelated restructuring.
-- Each serious pattern candidate records observed pressure, simplest alternative, Apply/Reject/Investigate, benefit, cost, evidence, and what would change the verdict. Unsupported choices remain Investigate with a concrete evidence-gathering action.
+Surface the research in the generated document itself: give a short, original example adapted to the project, explain the simpler alternative, show how behavior changes, and state the benefit and cost. Use a concrete scenario or illustrative pseudocode. Keep examples self-contained; do not substitute external URLs or catalog referrals for the explanation. This adds no file-contract or requirement-traceability deliverable.
 
-For an actual object-design question, read [OOP design](references/oop-design.md), then only relevant sections of [pattern deep dives](references/pattern-deep-dives.md). Use the hydration checklist to map participants to real components at Gate 2 and exact files/contracts/tests at Gate 3. Consult [Refactoring.Guru's catalog](https://refactoring.guru/design-patterns/catalog) and relevant pattern pages; cite sources beside decisions and distinguish source intent from local inference. Skip this research when no object-design pressure exists. Queues, replication, and deployment topology still require the relevant Grunt catalogs and appropriate primary sources.
-
-SELECT compares undecided candidates; REVIEW tests the saved choice against approved intent. The reviewer writes findings only. The controller applies justified revisions, reconciles requirement changes with user decisions, and resolves P0/P1 design blockers before dependent planning. Escalate consequential unresolved decisions to the controller; do not silently approve them or launch another workflow. In Gate 2 JSON, retain the existing selected/rejected enum; keep Investigate candidates and evidence actions in architecture Markdown, never encode them as selected.
+In SELECT, include examples in the design recommendation. In REVIEW, judge whether the document's example supports its pattern choice; report only consequential, evidence-backed weaknesses. Put a small illustrative correction in a finding when useful. The authoring gate updates the document; the reviewer never edits its target.
 
 ## Serving Astra Gate 2
 

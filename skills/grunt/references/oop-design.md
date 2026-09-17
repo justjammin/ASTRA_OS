@@ -1,29 +1,29 @@
 # OOP design: choose from pressure
 
-Use this guide during architecture planning. These are redMage's engineering judgments and original examples, not copied catalog examples. Read the linked primary pattern page for a shortlisted candidate. If browsing is unavailable, cite this local guide as the basis and disclose that the upstream reference was not checked. Never invent live verification.
+Use this guide during architecture planning. Adapted from redMage Protect's engineering guidance and original examples. Explain relevant research through self-contained examples in the generated document; do not direct the reader to external URLs.
 
 Start with a direct function or cohesive module. Add a pattern only when it buys a named requirement. A pattern does not require a class in languages with first-class functions. Respect repository conventions and abstraction thresholds. These are object-design choices; consult Grunt's separate catalogs for distributed systems, storage and resilience.
 
-For deeper comparisons, file shapes and tested examples, read [pattern deep dives](pattern-deep-dives.md) for the shortlisted candidates.
+For deeper comparisons and worked examples, read [pattern deep dives](pattern-deep-dives.md) for the shortlisted candidates.
 
 ## Selection table
 
 | Approach | Pick when / observed pressure | Advantages | Costs / reject when | Smallest credible shape |
 |---|---|---|---|---|
 | Direct function/module | One cohesive operation with no demonstrated variation | Easy to trace, test and change | Split only when responsibilities actually diverge | Inputs → result; explicit dependencies |
-| [Strategy](https://refactoring.guru/design-patterns/strategy) | Callers select genuinely different algorithms for one operation | Separates independently changing algorithms | Selection becomes caller responsibility; reject speculative variants | Inject a callable; class only if it owns meaningful state |
-| [Adapter](https://refactoring.guru/design-patterns/adapter) | Existing external interface conflicts with the application's contract | Keeps vendor shapes at the boundary | Mapping and error translation need maintenance; reject pass-through wrapping with no mismatch | One boundary module translating inputs/results |
-| [State](https://refactoring.guru/design-patterns/state) | Many operations vary with lifecycle state and transitions have rules | Makes state-specific behavior explicit | More objects and transition coordination; reject for a tiny stable enum switch | Start with an enum and transition function |
-| [Factory Method](https://refactoring.guru/design-patterns/factory-method) | An established creator hierarchy needs subclasses to choose the product | Reuses workflow while varying construction | Couples design to inheritance; reject when a simple construction function works | Overridable creation method; a switch factory is not GoF Factory Method |
-| [Builder](https://refactoring.guru/design-patterns/builder) | Complex construction has meaningful stages or representations | Separates assembly from finished object | Extra lifecycle and validation paths; reject for ordinary optional parameters | Plain options object first |
-| [Decorator](https://refactoring.guru/design-patterns/decorator) | Behavior must compose around a stable interface | Independent wrappers can combine | Ordering and debugging become harder; reject when one explicit call suffices | Wrapper accepting and returning the same interface |
-| [Facade](https://refactoring.guru/design-patterns/facade) | Callers repeatedly coordinate a complex subsystem | Smaller caller-facing surface | Can become a catch-all; reject one-caller forwarding layers | A focused use-case entry point |
-| [Observer](https://refactoring.guru/design-patterns/observer) | Multiple independent listeners react to a local change | Publisher need not know each listener | Hidden ordering, lifetime and failure behavior; reject simple direct calls | Subscription with explicit unsubscribe and error policy |
-| [Command](https://refactoring.guru/design-patterns/command) | Actions need identity, deferred execution or undo | Makes action data explicit | Serialization/undo add obligations; reject ordinary immediate calls | Action data plus handler; retries need separate idempotency design |
-| [Composite](https://refactoring.guru/design-patterns/composite) | Leaves and nested groups share a real operation | Uniform tree traversal | Harder to constrain invalid children; reject flat collections | Recursive data union before class hierarchy |
-| [Singleton](https://refactoring.guru/design-patterns/singleton) | One process-local instance is genuinely required and lifecycle is controlled | Centralizes instance ownership | Global coupling and test contamination; does not ensure distributed uniqueness | Prefer instance created at composition root and injected |
+| Strategy | Callers select genuinely different algorithms for one operation | Separates independently changing algorithms | Selection becomes caller responsibility; reject speculative variants | Inject a callable; class only if it owns meaningful state |
+| Adapter | Existing external interface conflicts with the application's contract | Keeps vendor shapes at the boundary | Mapping and error translation need maintenance; reject pass-through wrapping with no mismatch | One boundary module translating inputs/results |
+| State | Many operations vary with lifecycle state and transitions have rules | Makes state-specific behavior explicit | More objects and transition coordination; reject for a tiny stable enum switch | Start with an enum and transition function |
+| Factory Method | An established creator hierarchy needs subclasses to choose the product | Reuses workflow while varying construction | Couples design to inheritance; reject when a simple construction function works | Overridable creation method; a switch factory is not GoF Factory Method |
+| Builder | Complex construction has meaningful stages or representations | Separates assembly from finished object | Extra lifecycle and validation paths; reject for ordinary optional parameters | Plain options object first |
+| Decorator | Behavior must compose around a stable interface | Independent wrappers can combine | Ordering and debugging become harder; reject when one explicit call suffices | Wrapper accepting and returning the same interface |
+| Facade | Callers repeatedly coordinate a complex subsystem | Smaller caller-facing surface | Can become a catch-all; reject one-caller forwarding layers | A focused use-case entry point |
+| Observer | Multiple independent listeners react to a local change | Publisher need not know each listener | Hidden ordering, lifetime and failure behavior; reject simple direct calls | Subscription with explicit unsubscribe and error policy |
+| Command | Actions need identity, deferred execution or undo | Makes action data explicit | Serialization/undo add obligations; reject ordinary immediate calls | Action data plus handler; retries need separate idempotency design |
+| Composite | Leaves and nested groups share a real operation | Uniform tree traversal | Harder to constrain invalid children; reject flat collections | Recursive data union before class hierarchy |
+| Singleton | One process-local instance is genuinely required and lifecycle is controlled | Centralizes instance ownership | Global coupling and test contamination; does not ensure distributed uniqueness | Prefer instance created at composition root and injected |
 
-The linked [catalog](https://refactoring.guru/design-patterns/catalog) includes other candidates. Expand only for actual pressure; this is a shortlist, not a complete OOP manual.
+Expand beyond this shortlist only for actual pressure; it is not a complete OOP manual.
 
 ## Distinguish similar choices
 
@@ -59,7 +59,7 @@ assert quote(1200, postal_cents) == 700
 assert quote(1200, pickup_cents) == 0
 ```
 
-File shape: keep both policies together while small; separate only when ownership or dependencies diverge. Test observable quotes, not whether a strategy object was called.
+The example separates pricing behavior without a class hierarchy. A single pricing policy would be simpler as a direct call.
 
 ### Adapter around an incompatible response
 
@@ -78,7 +78,7 @@ adapter = BalanceAdapter(lambda account_id: {"available_minor_units": 2500})
 assert adapter.balance_cents("account-1") == 2500
 ```
 
-File shape: vendor import and mapping in the integration boundary. Avoid inventing an abstract repository around this one operation. Tests cover translations and real error semantics.
+The example translates an incompatible vendor response. If the response already matched what callers need, the wrapper would add no value.
 
 ### A small lifecycle before State objects
 
@@ -110,14 +110,10 @@ else:
     raise AssertionError("Sent items must not be cancelled")
 ```
 
-File shape: lifecycle and transition rules live with the feature; persistence remains an explicit boundary. Test allowed and rejected user-visible transitions.
+The example makes allowed and rejected transitions explicit. A small stable lifecycle does not need a hierarchy of State objects.
 
-## Record the decision
+## Show the decision in the document
 
-For each selected or seriously considered pattern, record:
+Adapt a relevant example to the project's actual problem. Explain the observed pressure, the simplest alternative, how behavior changes, and the tradeoff. For example: a vendor balance arrives as `available_minor_units: 2500`; an Adapter exposes `balance_cents: 2500` to callers, isolating the vendor naming at the cost of one translation step. If callers can already use the vendor response unchanged, call it directly.
 
-| Requirement | Pressure/evidence | Choice | Benefit | Cost | Rejected simpler alternative | Verification | Revisit trigger |
-|---|---|---|---|---|---|---|---|
-| FR: show external balance | Vendor response differs from domain contract | Adapter | Isolates translation | One mapping boundary | Pass vendor response through UI: leaks provider fields | Contract mapping test | Provider contract changes |
-
-Keep the example illustrative; replace it with actual IDs, file paths, contracts and evidence. Grunt's Apply/Reject/Investigate verdict belongs beside the decision. Unknown future variants are not evidence for an abstraction.
+Keep examples illustrative, not prescribed file contracts or requirement-traceability tables. Include the explanation inline rather than an external URL. Unknown future variants are not evidence for an abstraction.

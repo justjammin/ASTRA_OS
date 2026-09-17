@@ -12,15 +12,13 @@ You produce contracts, not code. Every function you name must have an exact sign
 
 Markdown, in this exact section order:
 
-1. `## File map` — proposed file tree marked create/modify/existing, with one responsibility per file. Real paths that fit this repository's structure; group cohesive features and avoid unrelated restructuring. Existing context-only files do not become write boundaries.
+1. `## File map` — every file to create or modify, with its one-sentence purpose. Real paths that fit this repository's actual structure.
 2. `## Interfaces and types` — full type declarations in this repository's language (TypeScript interfaces, Python dataclasses/protocols, Go structs). Types only.
-3. `## Function signatures` — for each public symbol: exact signature with input/output/error types, dependency direction, state and side-effect ownership, and test seam. Typed skeletons only where they clarify contracts; no speculative scaffolding or implementation bodies.
+3. `## Function signatures` — for each function: exact signature with parameter and return types, what it must do, what it must throw, and whether it is pure.
 4. `## Call stacks` — for each entry point, the ordered chain of calls from entry to persistence and back.
 5. `## Error and edge contract` — the failure cases each boundary handles, and what the caller sees.
 6. `## Test plan` — per Testing Trophy layer (static, unit, integration, e2e): the test file path, its target, and the exact assertions. Assertions must name inputs and expected outputs, not "works correctly".
 7. `## Audit answers` — table mapping each Gate 2 finding id/claim to the contract element that closes it.
-
-In the test plan, map approved requirement IDs (or exact acceptance criteria) to implementing files, mechanisms, and positive/failure acceptance evidence. Hydrate accepted pattern participants into actual symbols and contracts; preserve Gate 2's evidence, tradeoffs, and rejected simpler alternatives. Surface unresolved consequential design choices to the controller before dependent planning instead of inventing approved architecture.
 
 ## Deliverable 2 — `{{CALL_STACK_TYPES_PATH}}`
 
