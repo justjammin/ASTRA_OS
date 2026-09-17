@@ -38,7 +38,7 @@ import { readInteraction, respondInteraction } from "../lib/policy.mjs";
 import { initializeSession, loadSession, mutateSession, WORKER_MODELS } from "../lib/broker.mjs";
 
 const PKG_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const SKILLS = ["stella", "grunt", "mermaid", "open-pencil"];
+const SKILLS = ["stella", "grunt", "mermaid", "open-pencil", "final-review"];
 const COMMAND_FILES = ["astra.md", "grunt.md"];
 const MCP_NAME = "astra";
 const MCP_SERVER = join(PKG_ROOT, "lib", "mcp-server.mjs");

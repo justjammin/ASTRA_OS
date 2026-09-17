@@ -94,7 +94,7 @@ exit 0
     const first = await runInstall(home, envPath, log);
     assert.equal(first.code, 0, first.stderr);
     for (const [host, base] of [["claude", ".claude"], ["codex", ".codex"], ["droid", ".factory"]]) {
-      for (const skill of ["stella", "grunt", "mermaid", "open-pencil"]) {
+      for (const skill of ["stella", "grunt", "mermaid", "open-pencil", "final-review"]) {
         assert.ok(await readFile(join(home, base, "skills", skill, "SKILL.md")), `${host} missing ${skill}`);
       }
       await assert.rejects(readFile(join(home, base, "skills", "astra", "SKILL.md")));

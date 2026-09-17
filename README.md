@@ -15,13 +15,13 @@ The premise, started from a journey into harness orchestration, graph engineerin
 ## Install
 
 ```bash
-npx @ninjamin/astra-os          # installs the stella + grunt + mermaid + open-pencil skills for detected hosts, registers Astra MCP, builds the role map
+npx @ninjamin/astra-os          # installs bundled skills for detected hosts, registers Astra MCP, builds the role map
 npm i -g @ninjamin/astra-os     # or install the astra CLI globally (preferred)
 ```
 
 Also installable as a plugin: `.claude-plugin/`, `.codex-plugin/`, and `plugin.source.json` ship in the package, with `skills/`, `commands/`, and `agents/` wired up.
 
-Claude Code, Factory Droid, and Codex can also drive Astra through its MCP bridge. Installing the package runs a safe postinstall: detected hosts receive the Stella, Grunt, Mermaid, and OpenPencil skills, and the Astra MCP server is registered with the host's official interface when available. Existing MCP conflicts are preserved with a warning; missing hosts are skipped. See `docs/harnesses/mcp.md`.
+Claude Code, Factory Droid, and Codex can also drive Astra through its MCP bridge. Installing the package runs a safe postinstall: detected hosts receive the Stella, Grunt, Mermaid, OpenPencil, and Final Review skills, and the Astra MCP server is registered with the host's official interface when available. Existing MCP conflicts are preserved with a warning; missing hosts are skipped. See `docs/harnesses/mcp.md`.
 
 ## Quickstart
 
@@ -90,6 +90,10 @@ astra roles show astra-integration-verifier
 ## grunt
 
 `grunt` is Astra's adversarial reviewer, with its catalogs, judge protocol, and MAGI tribunal intact: pattern selection by observed pressure, rejection with the missing evidence named, a grounding taxonomy where a `claim` needs `file:line` and a `guess` is always low confidence, and the P0/P1/P2 severity ladder. It runs at Gate 2 and can be invoked directly for design or code review.
+
+## Final product review
+
+After Gate 5, invoke `final-review` with the run slug and optional slice ID to review the completed implementation against approved requirements, contracts, and actual verification evidence. It works with both CLI-driven Astra and host-native Stella. The solo reviewer saves grounded findings and a concrete correction plan to `.astra/<slug>/docs/final-review.md`; corrections begin only after human approval. Approved fixes retain contract boundaries, rerun affected checks, and receive another review before the revised result is presented for acceptance. This is an optional skill, not an additional machine-enforced gate; it does not merge, deploy, or close the run.
 
 ## Runtime
 
