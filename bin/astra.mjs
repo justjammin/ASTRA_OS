@@ -16,6 +16,7 @@ import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { workerCompaction } from "../lib/compaction.mjs";
 import { ADAPTER_IDS, detectAll, getAdapter } from "../lib/adapters.mjs";
 import { GATES, GATE_IDS, checkGate, gateId, getGate } from "../lib/gates.mjs";
 import {
@@ -287,6 +288,10 @@ function contextFor({ cwd, root, ledger }, flags) {
     specialists: flags.specialists === "false" ? false : true,
     timeoutMs: flags.timeout ? Number(flags.timeout) * 1000 : undefined,
     budgetTokens: flags["budget-tokens"] ?? ledger.meta.budgetTokens ?? null,
+    workerCompaction: workerCompaction({
+      ratio: flags["worker-compact-at"] === undefined ? ledger.meta.workerCompaction?.ratio : Number(flags["worker-compact-at"]),
+      contextWindow: flags["worker-context-window"] === undefined ? ledger.meta.workerCompaction?.contextWindow : Number(flags["worker-context-window"]),
+    }),
     workerModel: WORKER_MODELS[flags.agent ?? ledger.meta.agent] ?? { model: null, effort: null },
   };
 }
@@ -312,6 +317,10 @@ async function cmdStart(positional, flags) {
     if (!Number.isSafeInteger(budget) || budget <= 0) throw exit("--budget-tokens must be a positive integer", 1);
   }
 
+  const compaction = workerCompaction({
+    ratio: flags["worker-compact-at"] === undefined ? undefined : Number(flags["worker-compact-at"]),
+    contextWindow: flags["worker-context-window"] === undefined ? undefined : Number(flags["worker-context-window"]),
+  });
   const cwd = process.cwd();
   const slug = flags.slug ? slugify(flags.slug) : slugify(intent);
   const root = runRoot(cwd, slug, flags.out);
@@ -329,6 +338,7 @@ async function cmdStart(positional, flags) {
   await ensureDir(root);
   const ledger = emptyLedger({ slug, intent, agent, judge, runRoot: root, cwd });
   ledger.meta.runtime = runtime;
+  ledger.meta.workerCompaction = compaction;
   ledger.meta.budgetTokens = flags["budget-tokens"] ? Number(flags["budget-tokens"]) : null;
   await saveLedger(root, ledger);
 
@@ -648,6 +658,7 @@ function usage() {
       "  astra                                install skills, plugin files, and the role map",
       '  astra start "<intent>"               open a run   [--agent claude|droid|opencode|hermes|codex|pi]',
       "                                                    [--judge solo|magi] [--runtime local|langgraph] [--budget-tokens N]",
+      "                                                    [--worker-compact-at 0.5] [--worker-context-window N]",
       "                                                    [--gui|--no-gui] [--out <dir>]",
       "  astra run [--all] [--dry-run]        drive the current gate with the run's agent CLI",
       "                                       gate 5 only: [--slice tracer|<id>] [--concurrency N] [--timeout <sec>]",

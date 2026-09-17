@@ -131,6 +131,7 @@ test("agent DAG nodes receive and record their derived execution policy", async 
   assert.equal(result.status, "passed");
   assert.equal(calls.length, 1);
   assert.equal(calls[0].options.executionPolicy.profile, "dag-worker");
+  assert.deepEqual(calls[0].options.compaction, { ratio: 0.5, contextWindow: null });
   const state = JSON.parse(await readFile(join(root, "json", "dag-execution.json"), "utf8"));
   assert.equal(state.nodes[0].policy.profile, "dag-worker");
   assert.equal(state.nodes[0].policy.backend, "claude");

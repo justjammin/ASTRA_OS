@@ -54,11 +54,13 @@ test("gate prepares host-native packets without invoking the pipeline", async ()
     runDesignGate: async () => { pipelineCalls += 1; throw new Error("pipeline must not run"); },
     runExecution: async () => { pipelineCalls += 1; throw new Error("pipeline must not run"); },
   });
-  await request(server, 1, "astra_start", { intent: "native gate packet" });
+  const compaction = { ratio: 0.4, contextWindow: 200000 };
+  await request(server, 1, "astra_start", { intent: "native gate packet", workerCompaction: compaction });
 
   const gate = await request(server, 2, "tools/call", { name: "astra_gate", arguments: {} });
   assert.equal(gate.result.isError, false);
   assert.equal(gate.result.structuredContent.gate.id, "product");
+  assert.deepEqual(gate.result.structuredContent.workerCompaction, compaction);
   assert.match(gate.result.structuredContent.prompt, /Product Architect Agent/);
   assert.equal(typeof gate.result.structuredContent.contracts[1].schema, "object");
   assert.equal(pipelineCalls, 0);
@@ -70,6 +72,7 @@ test("gate prepares host-native packets without invoking the pipeline", async ()
   await request(server, 3, "astra_advance", {});
   const architecture = await request(server, 4, "astra/gate", { gate: "architecture", judge: "magi" });
   assert.equal(architecture.result.reviewerPackets.length, 3);
+  assert.ok(architecture.result.reviewerPackets.every((packet) => packet.compaction.ratio === 0.4));
   assert.match(architecture.result.reviewerPackets[0].prompt, /adversarial reviewer/);
   assert.equal(pipelineCalls, 0);
 });

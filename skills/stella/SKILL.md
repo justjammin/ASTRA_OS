@@ -19,3 +19,11 @@ Use one session per project; `.astra/<slug>/status.json` is authoritative.
 Gate packets are derived from the checked-in prompt files; do not invent gate contracts. Human approval remains required between gates. Keep MCP diagnostics off the protocol stream.
 
 Never invoke the astra CLI or `astra_run`; Stella is host-native MCP orchestration.
+
+## Worker context windows
+
+Each native subagent owns its context and compaction independently. Read `workerCompaction` from the gate packet or `compaction` from its reviewer/node packet (default ratio `0.5`). At spawn, apply this policy using the host's documented per-subagent controls when exposed. For a token threshold, use the worker's known model capacity multiplied by the ratio; never substitute cumulative run spend or the coordinator's capacity. If the worker uses a different model, resolve its capacity separately.
+
+If the host exposes no per-subagent control, leave native auto-compaction in charge and report `native-default` with that limitation. Never invent spawn arguments, change global host configuration, or claim a prompt instruction enforces a threshold. Record requested policy and actual support in `<run-root>/docs/worker-context.md`, keyed by worker/session ID; this record belongs to the controller, not the worker's source write boundary. Astra's CLI adapter capabilities do not establish support in a native host.
+
+Tell each worker to preserve its task, acceptance criteria, exact write boundary, decisions, changed files, verification evidence, and remaining work in any supported compaction summary. After compaction, reload authoritative contracts and relevant artifacts before continuing. Compaction preserves the existing task and permissions; it does not restart implementation or authorize wider scope.
