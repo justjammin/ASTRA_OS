@@ -1,23 +1,21 @@
 ---
 name: stella
-description: Use Astra's host-native MCP workflow when a change needs durable product, architecture, contract, graph, and execution gates.
+description: Use Astra's MCP gates with Claude-native work and subagents for durable, human-approved software-factory runs.
 ---
 
-# Stella — host-native Astra workflow
+# Stella for Claude
 
-Stella drives the five Astra gates through MCP while the host owns work, context, and subagents.
-Use one session per project; `.astra/<slug>/status.json` is authoritative.
+Use the Astra MCP server and Claude's native work/subagent facilities. Keep one run per project;
+`.astra/<slug>/status.json` is authoritative.
 
-1. Call `astra_start` for a new intent, or `astra_session` with `action: "list"` to find a run.
-2. Call `astra_check` before every operation and use its current phase.
-3. Call `astra_gate` to get the rendered prompt/contracts, then run that packet with the host's native work/subagent facilities; keep workers inside their declared write boundaries. At Gate 2, dispatch native reviewers and aggregate their findings into the audit artifact; at Gate 5, dispatch native DAG subagents and persist the execution artifact.
-4. Call `astra_check` after host writes to validate the artifacts, then show its checks and artifact paths to the user.
-5. After explicit approval, call `astra_approve` with `human: true`, then `astra_advance`. Use `astra_loop` for requested rework.
-6. Use `astra_visualizer` when the user wants the review console. Resolve waits with `astra_respond` and the exact resume token.
-7. Call `astra_complete` only when the user asks to close the run.
+1. Call `astra_start`, or `astra_session` with `action: "list"` to resume an existing run.
+2. Call `astra_check` before every transition.
+3. Call `astra_gate` to get the rendered prompt/contracts from `lib/prompts/gate*.md`, then dispatch the packet with native Claude work/subagents. At Gate 2, aggregate native reviewer findings into the audit artifact; at Gate 5, dispatch native DAG subagents and persist the execution artifact. Respect every declared write boundary.
+4. Call `astra_check` after host writes to validate and surface artifact checks. Ask the user before `astra_approve` with `human: true`, then call `astra_advance`.
+5. Use `astra_loop` for requested rework, `astra_visualizer` for review, and `astra_respond` with the exact resume token for waits.
+6. Call `astra_complete` only on explicit request.
 
-Gate packets are derived from the checked-in prompt files; do not invent gate contracts. Human approval remains required between gates. Keep MCP diagnostics off the protocol stream.
-
+Never infer a phase or approval from chat. MCP diagnostics stay on stderr.
 Never invoke the astra CLI or `astra_run`; Stella is host-native MCP orchestration.
 
 ## Worker context windows
