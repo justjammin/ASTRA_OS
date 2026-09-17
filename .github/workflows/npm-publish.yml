@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing version tag to publish
+        description: Existing version tag to publish (0.2.5 or v0.2.5)
         required: true
         type: string
 
@@ -26,10 +26,22 @@ jobs:
     environment:
       name: npm-release
     steps:
+      - name: Normalize release tag
+        id: release-tag
+        env:
+          REQUESTED_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: |
+          release_version="${REQUESTED_TAG#v}"
+          if ! [[ "$release_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Expected a version such as 0.2.5 or v0.2.5" >&2
+            exit 1
+          fi
+          echo "tag=v$release_version" >> "$GITHUB_OUTPUT"
+
       - name: Check out release
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+          ref: refs/tags/${{ steps.release-tag.outputs.tag }}
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -50,7 +62,7 @@ jobs:
 
       - name: Verify version tag matches package
         env:
-          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          RELEASE_TAG: ${{ steps.release-tag.outputs.tag }}
         run: |
           test "$RELEASE_TAG" = "v$(node -p "require('./package.json').version")" || {
             echo "Tag $RELEASE_TAG does not match package version $(node -p "require('./package.json').version")" >&2
